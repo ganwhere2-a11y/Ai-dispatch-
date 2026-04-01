@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Dispatch — Command Center</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; padding: 16px; max-width: 480px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #2a2d3a; }
+    .header h1 { font-size: 18px; font-weight: 700; color: #fff; }
+    .header .date { font-size: 12px; color: #888; }
+    .context-bar { display: flex; gap: 8px; margin-bottom: 20px; }
+    .ctx-btn { padding: 6px 16px; border-radius: 20px; border: 1px solid #2a2d3a; background: #1a1d27; color: #888; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+    .ctx-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .section { background: #1a1d27; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 12px; }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .metric { text-align: center; }
+    .metric .value { font-size: 28px; font-weight: 700; color: #fff; }
+    .metric .label { font-size: 11px; color: #666; margin-top: 2px; }
+    .metric .trend { font-size: 11px; margin-top: 2px; }
+    .trend-up { color: #22c55e; }
+    .trend-down { color: #ef4444; }
+    .priority-list { list-style: none; }
+    .priority-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #2a2d3a; }
+    .priority-item:last-child { border-bottom: none; }
+    .priority-num { width: 22px; height: 22px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+    .priority-text { font-size: 13px; line-height: 1.4; }
+    .action-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #2a2d3a; }
+    .action-item:last-child { border-bottom: none; }
+    .action-text { font-size: 13px; flex: 1; }
+    .action-btns { display: flex; gap: 6px; }
+    .btn { padding: 5px 12px; border-radius: 6px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-approve { background: #22c55e; color: #000; }
+    .btn-reject { background: #ef4444; color: #fff; }
+    .status-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2d3a; font-size: 13px; }
+    .status-row:last-child { border-bottom: none; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .dot-green { background: #22c55e; }
+    .dot-yellow { background: #eab308; }
+    .dot-red { background: #ef4444; }
+    .all-good { color: #22c55e; text-align: center; font-size: 13px; padding: 8px 0; }
+    .iron-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .iron-stat { text-align: center; background: #0f1117; border-radius: 8px; padding: 8px; }
+    .iron-stat .num { font-size: 20px; font-weight: 700; color: #ef4444; }
+    .iron-stat .lbl { font-size: 10px; color: #666; margin-top: 2px; }
+    footer { text-align: center; font-size: 11px; color: #444; margin-top: 20px; padding-top: 12px; border-top: 1px solid #2a2d3a; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Command Center</h1>
+    <div class="date">{{DATE}} — {{TIME}}</div>
+  </div>
+
+  <div class="context-bar">
+    <button class="ctx-btn {{USA_ACTIVE}}">🇺🇸 USA</button>
+    <button class="ctx-btn {{CANADA_ACTIVE}}">🇨🇦 Canada</button>
+    <button class="ctx-btn {{EU_ACTIVE}}">🇪🇺 Europe</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Business State</div>
+    <div class="metric-grid">
+      <div class="metric">
+        <div class="value">{{ACTIVE_LOADS}}</div>
+        <div class="label">Active Loads</div>
+        <div class="trend {{LOADS_TREND_CLASS}}">{{LOADS_TREND}}</div>
+      </div>
+      <div class="metric">
+        <div class="value">${{REVENUE_WEEK}}</div>
+        <div class="label">Revenue This Week</div>
+        <div class="trend {{REVENUE_TREND_CLASS}}">{{REVENUE_TREND}}</div>
+      </div>
+      <div class="metric">
+        <div class="value">{{TRUCK_COUNT}}</div>
+        <div class="label">Trucks Under Mgmt</div>
+        <div class="trend trend-up">Year goal: 200</div>
+      </div>
+      <div class="metric">
+        <div class="value">{{TRIAL_COUNT}}</div>
+        <div class="label">Trial Prospects</div>
+        <div class="trend {{TRIAL_TREND_CLASS}}">{{TRIAL_TREND}}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Today's Priority List</div>
+    <ul class="priority-list">
+      {{PRIORITY_ITEMS}}
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Needs Your Decision</div>
+    {{ACTION_ITEMS}}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Iron Rule Activity (This Week)</div>
+    <div class="iron-stats">
+      <div class="iron-stat"><div class="num">{{REJECT_FL}}</div><div class="lbl">No Florida</div></div>
+      <div class="iron-stat"><div class="num">{{REJECT_RPM}}</div><div class="lbl">Low RPM</div></div>
+      <div class="iron-stat"><div class="num">{{REJECT_DH}}</div><div class="lbl">Deadhead</div></div>
+      <div class="iron-stat"><div class="num">{{REJECT_WT}}</div><div class="lbl">Weight</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Agent Status</div>
+    {{AGENT_STATUS_ROWS}}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Anything Wrong</div>
+    {{ISSUES_SECTION}}
+  </div>
+
+  <footer>Generated by Daniel at {{GENERATED_TIME}} | AI Dispatch OS</footer>
+
+  <script>
+    // Context switching
+    document.querySelectorAll('.ctx-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.ctx-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+      })
+    })
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{
+  "decision_schema": {
+    "id": "string — unique ID, e.g. dec_001",
+    "timestamp": "ISO 8601 datetime",
+    "agent": "string — Daniel | Erin | Sales | Compliance | Onboarding | Support | Marketer | Shadow | FamilyDesk",
+    "context": "string — USA | CANADA | EUROPE",
+    "situation_type": "string — see situation_types below",
+    "inputs": "object — all data available at decision time",
+    "recommendation": "string — what the agent suggested",
+    "owner_decision": "string — what owner actually decided (ACCEPT | REJECT | MODIFY | ESCALATE)",
+    "modification_notes": "string — if owner modified, what changed",
+    "outcome": "string — what happened after (filled in later)",
+    "outcome_date": "ISO 8601 datetime",
+    "lesson": "string — what should be learned from this",
+    "confidence_before": "number 0-1 — how confident agent was",
+    "confidence_after": "number 0-1 — updated after outcome known",
+    "autonomous_eligible": "boolean — true when confidence_after > 0.85 on 10+ similar decisions"
+  },
+
+  "situation_types": [
+    "load_evaluation",
+    "carrier_selection",
+    "rate_quote",
+    "iron_rule_trigger",
+    "compliance_flag",
+    "trial_conversion",
+    "lead_outreach_timing",
+    "escalation_routing",
+    "carrier_vetting",
+    "client_complaint",
+    "invoice_dispute",
+    "capacity_gap",
+    "lane_selection",
+    "new_market_entry"
+  ],
+
+  "confidence_thresholds": {
+    "ask_owner": "0.0 - 0.59",
+    "suggest_with_approval": "0.60 - 0.84",
+    "autonomous_action": "0.85 - 1.0"
+  },
+
+  "promotion_rules": {
+    "min_similar_decisions": 10,
+    "min_confidence": 0.85,
+    "max_outcome_failures": 1,
+    "review_cycle_days": 30
+  }
+}

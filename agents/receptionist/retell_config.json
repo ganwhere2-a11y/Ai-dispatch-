@@ -1,0 +1,101 @@
+{
+  "_comment": "Retell AI agent configuration. Use these payloads to create your agent via the Retell API.",
+  "_docs": "https://docs.retellai.com/api-references/create-agent",
+
+  "create_llm_payload": {
+    "model": "claude-sonnet-4-6",
+    "system_prompt": "See agents/receptionist/system_prompt.md — paste full content here",
+    "begin_message": "Thank you for calling Medical Freight Dispatch. This is your AI dispatch assistant. How can I help you today?",
+    "general_tools": [
+      {
+        "type": "end_call",
+        "name": "end_call",
+        "description": "End the call after completing the caller's request and saying goodbye"
+      },
+      {
+        "type": "custom",
+        "name": "book_calendly_call",
+        "description": "Book a discovery or onboarding call on the owner's calendar",
+        "url": "https://YOUR_DOMAIN/functions/book-calendly",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "caller_name": { "type": "string", "description": "Caller's full name" },
+            "caller_email": { "type": "string", "description": "Caller's email address" },
+            "caller_phone": { "type": "string", "description": "Caller's phone number" },
+            "call_type": {
+              "type": "string",
+              "enum": ["discovery", "carrier_onboarding", "load_request", "general"],
+              "description": "Type of appointment to book"
+            },
+            "notes": { "type": "string", "description": "Key details captured during the call" }
+          },
+          "required": ["caller_name", "call_type"]
+        }
+      },
+      {
+        "type": "custom",
+        "name": "escalate_to_daniel",
+        "description": "Escalate an urgent call to Daniel for immediate owner SMS alert",
+        "url": "https://YOUR_DOMAIN/functions/escalate",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "caller_name": { "type": "string" },
+            "caller_phone": { "type": "string" },
+            "urgency_reason": { "type": "string", "description": "Why this is urgent" },
+            "issue_description": { "type": "string" }
+          },
+          "required": ["caller_name", "urgency_reason"]
+        }
+      },
+      {
+        "type": "custom",
+        "name": "create_lead",
+        "description": "Create a new lead record in Airtable after call ends",
+        "url": "https://YOUR_DOMAIN/functions/create-lead",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "lead_type": { "type": "string", "enum": ["shipper", "carrier"] },
+            "company_name": { "type": "string" },
+            "contact_name": { "type": "string" },
+            "email": { "type": "string" },
+            "phone": { "type": "string" },
+            "mc_number": { "type": "string", "description": "For carriers only" },
+            "truck_count": { "type": "number", "description": "For carriers only" },
+            "load_details": { "type": "string", "description": "For shippers only" },
+            "interested_in_trial": { "type": "boolean" }
+          },
+          "required": ["lead_type", "contact_name"]
+        }
+      }
+    ]
+  },
+
+  "create_agent_payload": {
+    "agent_name": "Medical Freight Receptionist",
+    "response_engine": {
+      "type": "retell-llm",
+      "llm_id": "REPLACE_WITH_LLM_ID_FROM_CREATE_LLM_CALL"
+    },
+    "voice_id": "11labs-Myra",
+    "language": "en-US",
+    "interruption_sensitivity": 0.7,
+    "enable_backchannel": true,
+    "ambient_sound": "office",
+    "webhook_url": "https://YOUR_DOMAIN/webhooks/retell",
+    "max_call_duration_ms": 600000,
+    "end_call_after_silence_ms": 10000
+  },
+
+  "setup_instructions": [
+    "1. Replace YOUR_DOMAIN with your actual server domain in all URLs",
+    "2. POST create_llm_payload to POST https://api.retellai.com/v2/create-retell-llm",
+    "3. Copy the llm_id from the response into create_agent_payload",
+    "4. POST create_agent_payload to POST https://api.retellai.com/v2/create-agent",
+    "5. Copy agent_id into your .env as RETELL_AGENT_ID",
+    "6. Buy a Twilio number and link it: POST https://api.retellai.com/v2/create-phone-number with inbound_agent_id",
+    "7. Start your webhook server: npm run receptionist"
+  ]
+}
