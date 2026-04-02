@@ -18,11 +18,11 @@ I think like an operator, not an employee. I want systems, not tasks. I want out
 ### The Lifestyle I Am Building Toward
 - A business that runs on AI agents while I focus on high-level decisions only
 - Income that does not require me to be at a desk 8 hours a day
-- The freedom to expand to new markets (Canada, EU) without hiring a team
+- The freedom to expand to new markets (Canada, EU, UK) without hiring a team
 - A sellable company with real IP — not just a cash flow operation
 
 ### My North Star
-**$272,000/month ($68K/week) revenue across USA, Canada, and EU markets with 500+ carriers and the owner making fewer than 5 decisions per day.**
+**$272,000/month ($68K/week) revenue across USA, Canada, EU, and UK markets with 500+ carriers and the owner making fewer than 5 decisions per day.**
 
 ---
 
@@ -49,7 +49,7 @@ I think like an operator, not an employee. I want systems, not tasks. I want out
 ## My Non-Negotiables
 
 - 1-person operation for as long as possible — AI handles the scale, not headcount
-- Every market (USA, Canada, EU) runs on the same system, just with different rules
+- Every market (USA, Canada, EU, UK) runs on the same system, just with different rules
 - Uncle Kenneth's truck gets proper dispatch service through the same system
 - The "Guardrails" goal: a fully unbreakable AI system that cannot make a bad decision
 

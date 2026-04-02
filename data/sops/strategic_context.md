@@ -7,7 +7,7 @@
 
 ## The Vision
 
-A fully autonomous AI dispatch operation running across 3 markets (USA, Canada, EU), managing 500+ carriers, generating $272K/month, with the owner making fewer than 5 decisions per day.
+A fully autonomous AI dispatch operation running across 4 markets (USA, Canada, EU, UK), managing 500+ carriers, generating $272K/month, with the owner making fewer than 5 decisions per day.
 
 The end state is "Guardrails" — a fully unbreakable AI system where every decision flows through rule-based logic. No bad loads. No bad carriers. No manual work. Just the owner reviewing what needs review and the system handling everything else.
 
@@ -22,13 +22,14 @@ The end state is "Guardrails" — a fully unbreakable AI system where every deci
 - **CEO Shadow:** Phase 1 complete (observe), beginning Phase 2 (suggest)
 - **Milestone:** Owner making fewer than 10 decisions/day
 
-### Year 2 — Clone to Canada and EU
-- **Target:** 500+ carriers across all 3 markets
+### Year 2 — Clone to Canada, EU, UK
+- **Target:** 500+ carriers across all 4 markets
 - **System:** Same AI OS, different rule sets per market
   - Canada: Transport Canada, CVOR, CUSMA compliance layer
   - EU: GDP medical freight, CMR docs, cabotage rules
+  - UK: Post-Brexit rules, UK operator licenses
 - **CEO Shadow:** Phase 2 active (suggestions regularly adopted by owner)
-- **Milestone:** System running 3 markets with minimal owner involvement
+- **Milestone:** System running 4 markets with minimal owner involvement
 
 ### Year 3 — Guardrails Complete
 - **Target:** Fully unbreakable system, 500+ carriers globally
@@ -55,6 +56,7 @@ The end state is "Guardrails" — a fully unbreakable AI system where every deci
 | USA | Active | DOT/FMCSA, Iron Rules |
 | Canada | Year 2 | Transport Canada, CVOR, CUSMA |
 | EU | Year 2 | GDP, CMR, cabotage rules |
+| UK | Year 2 | Post-Brexit, UK operator license |
 
 All markets run on the same agent architecture. Only the compliance rules and rate benchmarks change per market. `ACTIVE_CONTEXT` env variable controls which market is live.
 

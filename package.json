@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node server.js",
     "maya": "node agents/maya/maya.js",
     "erin": "node agents/erin/erin.js",
     "receptionist": "node agents/receptionist/webhook_handler.js",

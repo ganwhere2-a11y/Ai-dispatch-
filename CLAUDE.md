@@ -363,8 +363,8 @@ The generator (`command_center/generator.js`) pulls live data from agent logs an
 
 Month 12 target: **200 trucks under management, $68K/week ($272K/month) revenue, 3 active markets (USA, Canada, EU).**
 
-Year 2 target: **Clone system to Canada and EU. 500+ carriers across all markets.**
+Year 2 target: **Clone system to Canada, EU, and UK. 500+ carriers across all markets.**
 
-Year 3 target: **500+ carrier/fleet companies across USA, Canada, EU — CEO Shadow fully operational (owner makes minimal decisions), agents handle 90%+ of all actions autonomously. "Guardrails" system — fully unbreakable AI rules across all markets.**
+Year 3 target: **500+ carrier/fleet companies across USA, Canada, EU, UK — CEO Shadow fully operational (owner makes minimal decisions), agents handle 90%+ of all actions autonomously. "Guardrails" system — fully unbreakable AI rules across all markets.**
 
 Every line of code you write should make the system more autonomous, not less. If you're adding a step that requires owner input for something that could be rule-based, redesign it.
