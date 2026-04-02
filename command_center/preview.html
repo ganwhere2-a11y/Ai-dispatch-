@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Dispatch — Command Center Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #0a0c10;
+      --surface:  #111318;
+      --card:     #161a22;
+      --border:   #1e2330;
+      --accent:   #2563eb;
+      --accent2:  #7c3aed;
+      --green:    #16a34a;
+      --green-lt: #22c55e;
+      --red:      #dc2626;
+      --red-lt:   #ef4444;
+      --yellow:   #d97706;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --subtle:   #334155;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── SIDEBAR ─────────────────────────────── */
+    .sidebar {
+      width: 220px;
+      min-height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-brand {
+      padding: 20px 16px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-brand .logo {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #fff;
+    }
+    .sidebar-brand .logo span { color: var(--accent); }
+    .sidebar-brand .sub {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .sidebar-section {
+      padding: 14px 12px 6px;
+    }
+    .sidebar-section-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      padding: 0 4px;
+      margin-bottom: 4px;
+    }
+    .agent-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 8px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .agent-row:hover { background: var(--card); }
+    .agent-row.active { background: rgba(37,99,235,0.12); }
+    .agent-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-green  { background: var(--green-lt); box-shadow: 0 0 4px rgba(34,197,94,0.5); }
+    .dot-yellow { background: #eab308; }
+    .dot-red    { background: var(--red-lt); }
+    .agent-row .name {
+      font-size: 12px;
+      color: var(--text);
+      flex: 1;
+    }
+    .agent-row .role {
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .kill-switch {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+    .kill-label { font-size: 10px; color: var(--muted); }
+    .toggle {
+      width: 28px; height: 16px;
+      background: var(--border);
+      border-radius: 8px;
+      position: relative;
+    }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 12px; height: 12px;
+      background: var(--muted);
+      border-radius: 50%;
+      top: 2px; left: 2px;
+    }
+
+    /* ── MAIN ────────────────────────────────── */
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      max-width: 900px;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .top-bar h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+    .top-bar .meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(22,163,74,0.12);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--green-lt);
+    }
+    .status-pill .pulse {
+      width: 7px; height: 7px;
+      background: var(--green-lt);
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(34,197,94,0.7);
+    }
+
+    /* ── MARKET TABS ─────────────────────────── */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* ── METRIC CARDS ────────────────────────── */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .metric-card .mlabel {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .metric-card .mvalue {
+      font-size: 30px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+    .metric-card .mtrend {
+      font-size: 11px;
+      margin-top: 5px;
+    }
+    .up   { color: var(--green-lt); }
+    .down { color: var(--red-lt); }
+    .neutral { color: var(--muted); }
+
+    /* ── ROW LAYOUT ──────────────────────────── */
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .row3 { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px; }
+
+    /* ── CARD ────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .card-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* ── PRIORITY LIST ───────────────────────── */
+    .priority-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .priority-item:last-child { border-bottom: none; }
+    .pnum {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700;
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .pnum.warn { background: var(--yellow); }
+    .ptext { font-size: 12px; line-height: 1.45; color: var(--text); flex: 1; }
+    .ptag {
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .ptag-erin    { background: rgba(37,99,235,0.15); color: #60a5fa; }
+    .ptag-maya    { background: rgba(124,58,237,0.15); color: #a78bfa; }
+    .ptag-sales   { background: rgba(22,163,74,0.15); color: #4ade80; }
+    .ptag-comply  { background: rgba(217,119,6,0.15); color: #fbbf24; }
+
+    /* ── DECISION CARDS ──────────────────────── */
+    .decision-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .decision-card:last-child { margin-bottom: 0; }
+    .dec-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .dec-tier {
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(217,119,6,0.15);
+      color: #fbbf24;
+      font-weight: 600;
+    }
+    .dec-agent { font-size: 10px; color: var(--muted); }
+    .dec-text { font-size: 12px; color: var(--text); line-height: 1.45; margin-bottom: 10px; }
+    .dec-btns { display: flex; gap: 6px; }
+    .btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+    }
+    .btn-approve { background: var(--green); color: #fff; }
+    .btn-reject  { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn-approve:hover { background: var(--green-lt); }
+
+    /* ── IRON RULES ──────────────────────────── */
+    .iron-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .iron-stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+    .iron-stat .inum {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--red-lt);
+      line-height: 1;
+    }
+    .iron-stat .inum.zero { color: var(--green-lt); }
+    .iron-stat .ilbl { font-size: 9px; color: var(--muted); margin-top: 3px; }
+
+    /* ── AGENT STATUS ────────────────────────── */
+    .agent-status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .agent-status-row:last-child { border-bottom: none; }
+    .asname { display: flex; align-items: center; gap: 6px; }
+    .asmsg { font-size: 10px; color: var(--muted); }
+
+    /* ── CEO SHADOW ──────────────────────────── */
+    .shadow-phase {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .phase-badge {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(124,58,237,0.15);
+      color: #a78bfa;
+      border: 1px solid rgba(124,58,237,0.3);
+    }
+    .phase-label { font-size: 11px; color: var(--muted); }
+    .shadow-stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .shadow-stat-row:last-child { border-bottom: none; }
+    .skey { color: var(--muted); }
+    .sval { color: #fff; font-weight: 600; }
+
+    /* ── FOOTER ──────────────────────────────── */
+    footer {
+      text-align: center;
+      font-size: 10px;
+      color: var(--muted);
+      padding: 16px 0 4px;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    .footer-dot { color: var(--accent); margin: 0 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">AI<span>Dispatch</span></div>
+      <div class="sub">Command Center</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Agents</div>
+
+      <div class="agent-row active">
+        <div class="agent-dot dot-green"></div>
+        <div class="name">Maya</div>
+        <div class="role">Executive</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-dot dot-green"></div>
+        <div class="name">Erin</div>
+        <div class="role">Dispatcher</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-dot dot-green"></div>
+        <div class="name">Compliance</div>
+        <div class="role">Gatekeeper</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-dot dot-green"></div>
+        <div class="name">Sales</div>
+        <div class="role">Lead Gen</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-dot dot-green"></div>
+        <div class="name">Onboarding</div>
+        <div class="role">Trial Funnel</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-dot dot-green"></div>
+        <div class="name">Support</div>
+        <div class="role">Retention</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-dot dot-green"></div>
+        <div class="name">Receptionist</div>
+        <div class="role">Voice AI</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-dot dot-green"></div>
+        <div class="name">Marketer</div>
+        <div class="role">Content</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-dot" style="background:#a78bfa; box-shadow:0 0 4px rgba(167,139,250,0.5)"></div>
+        <div class="name">CEO Shadow</div>
+        <div class="role">Observer</div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div>Generated by Maya · 6:02 AM</div>
+      <div class="kill-switch">
+        <span class="kill-label">Kill Switch</span>
+        <div class="toggle"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div>
+        <h1>Command Center</h1>
+        <div class="meta">Thursday, April 2, 2026 &nbsp;·&nbsp; USA Market Active</div>
+      </div>
+      <div class="status-pill">
+        <div class="pulse"></div>
+        All Systems Operational
+      </div>
+    </div>
+
+    <!-- MARKET TABS -->
+    <div class="tabs">
+      <div class="tab active">🇺🇸 USA</div>
+      <div class="tab">🇨🇦 Canada</div>
+      <div class="tab">🇪🇺 Europe</div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics">
+      <div class="metric-card">
+        <div class="mlabel">Active Loads</div>
+        <div class="mvalue">7</div>
+        <div class="mtrend up">↑ 11 decisions this week</div>
+      </div>
+      <div class="metric-card">
+        <div class="mlabel">Revenue This Week</div>
+        <div class="mvalue">$11,240</div>
+        <div class="mtrend up">↑ $1,440 vs last week</div>
+      </div>
+      <div class="metric-card">
+        <div class="mlabel">Trucks Under Mgmt</div>
+        <div class="mvalue">4</div>
+        <div class="mtrend neutral">Year goal: 200</div>
+      </div>
+      <div class="metric-card">
+        <div class="mlabel">Trial Prospects</div>
+        <div class="mvalue">3</div>
+        <div class="mtrend up">3 active trials</div>
+      </div>
+    </div>
+
+    <!-- PRIORITIES + DECISIONS -->
+    <div class="row">
+
+      <div class="card">
+        <div class="card-title">Today's Priority List</div>
+
+        <div class="priority-item">
+          <div class="pnum warn">1</div>
+          <div class="ptext">Carrier MC-884421 — authority age 172 days, approaching 180-day threshold</div>
+          <div class="ptag ptag-comply">Compliance</div>
+        </div>
+        <div class="priority-item">
+          <div class="pnum">2</div>
+          <div class="ptext">Load #1047 (Chicago → Dallas, 892mi) — awaiting carrier confirmation</div>
+          <div class="ptag ptag-erin">Erin</div>
+        </div>
+        <div class="priority-item">
+          <div class="pnum">3</div>
+          <div class="ptext">TruckPro LLC — Day 5 of 7, conversion call due today</div>
+          <div class="ptag ptag-maya">Onboarding</div>
+        </div>
+        <div class="priority-item">
+          <div class="pnum">4</div>
+          <div class="ptext">Sales: 14 new FMCSA leads scraped — outreach sequence queued</div>
+          <div class="ptag ptag-sales">Sales</div>
+        </div>
+        <div class="priority-item">
+          <div class="pnum">5</div>
+          <div class="ptext">CEO Shadow generating weekly pattern report</div>
+          <div class="ptag ptag-maya">Maya</div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div class="card-title">Needs Your Decision</div>
+
+        <div class="decision-card">
+          <div class="dec-meta">
+            <div class="dec-tier">TIER 2</div>
+            <div class="dec-agent">Escalated by Erin</div>
+          </div>
+          <div class="dec-text">Quote $5,400 — Chicago to Memphis, 487mi @ $3.20/RPM. New carrier first load. Compliance cleared. Needs owner sign-off.</div>
+          <div class="dec-btns">
+            <button class="btn btn-approve">Approve</button>
+            <button class="btn btn-reject">Reject</button>
+          </div>
+        </div>
+
+        <div class="decision-card">
+          <div class="dec-meta">
+            <div class="dec-tier">TIER 2</div>
+            <div class="dec-agent">Escalated by Onboarding</div>
+          </div>
+          <div class="dec-text">TruckPro LLC — convert trial to paid at $350/mo? 3 clean loads, no flags, carrier responded to all check-ins.</div>
+          <div class="dec-btns">
+            <button class="btn btn-approve">Approve</button>
+            <button class="btn btn-reject">Reject</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- IRON RULES + CEO SHADOW -->
+    <div class="row3">
+
+      <div class="card">
+        <div class="card-title">Iron Rule Activity — This Week</div>
+        <div class="iron-grid">
+          <div class="iron-stat">
+            <div class="inum">2</div>
+            <div class="ilbl">No Florida</div>
+          </div>
+          <div class="iron-stat">
+            <div class="inum">5</div>
+            <div class="ilbl">Low RPM</div>
+          </div>
+          <div class="iron-stat">
+            <div class="inum">1</div>
+            <div class="ilbl">Deadhead</div>
+          </div>
+          <div class="iron-stat">
+            <div class="inum zero">0</div>
+            <div class="ilbl">Weight</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">CEO Shadow</div>
+        <div class="shadow-phase">
+          <div class="phase-badge">Phase 1</div>
+          <div class="phase-label">Observe &amp; Learn</div>
+        </div>
+        <div class="shadow-stat-row">
+          <span class="skey">Decisions logged</span>
+          <span class="sval">47</span>
+        </div>
+        <div class="shadow-stat-row">
+          <span class="skey">Patterns matched</span>
+          <span class="sval">12</span>
+        </div>
+        <div class="shadow-stat-row">
+          <span class="skey">Confidence</span>
+          <span class="sval up">68%</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- AGENT STATUS -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Agent Status</div>
+      <div class="agent-status-row">
+        <div class="asname"><div class="agent-dot dot-green"></div> Maya</div>
+        <div class="asmsg">Morning report sent 6:02 AM</div>
+      </div>
+      <div class="agent-status-row">
+        <div class="asname"><div class="agent-dot dot-green"></div> Erin</div>
+        <div class="asmsg">7 active loads · 2 pending confirmation</div>
+      </div>
+      <div class="agent-status-row">
+        <div class="asname"><div class="agent-dot dot-green"></div> Compliance</div>
+        <div class="asmsg">All carriers vetted · 1 threshold warning</div>
+      </div>
+      <div class="agent-status-row">
+        <div class="asname"><div class="agent-dot dot-green"></div> Sales</div>
+        <div class="asmsg">14 leads in pipeline · Sequence day 1 running</div>
+      </div>
+      <div class="agent-status-row">
+        <div class="asname"><div class="agent-dot dot-green"></div> Onboarding</div>
+        <div class="asmsg">3 trials active · 1 conversion ready</div>
+      </div>
+      <div class="agent-status-row">
+        <div class="asname"><div class="agent-dot dot-green"></div> Receptionist</div>
+        <div class="asmsg">3 calls handled · 0 escalations today</div>
+      </div>
+      <div class="agent-status-row">
+        <div class="asname"><div class="agent-dot dot-green"></div> Support</div>
+        <div class="asmsg">No open complaints · 1 check-in sent</div>
+      </div>
+      <div class="agent-status-row">
+        <div class="asname"><div class="agent-dot" style="background:#a78bfa; box-shadow:0 0 4px rgba(167,139,250,0.5)"></div> CEO Shadow</div>
+        <div class="asmsg">Phase 1 · 47 decisions logged · Weekly report generating</div>
+      </div>
+    </div>
+
+    <footer>
+      Generated by Maya
+      <span class="footer-dot">·</span>
+      AI Dispatch OS
+      <span class="footer-dot">·</span>
+      Thursday, April 2 at 6:02 AM
+      <span class="footer-dot">·</span>
+      USA Market
+    </footer>
+
+  </div>
+
+</body>
+</html>
