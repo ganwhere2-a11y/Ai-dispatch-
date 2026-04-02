@@ -3,8 +3,9 @@
 
 **Status:** PROFILE TEMPLATE — Owner needs to fill in details below  
 **Account type:** Owner-family carrier (approved by owner 2026-04-02)  
-**Dispatched by:** Erin (same pipeline as all carriers)  
-**Tracked by:** Maya (flagged in morning reports as "KENNETH")
+**Operating market:** USA ONLY — not Canada, not EU  
+**Dispatched by:** Erin (same pipeline as all USA carriers)  
+**Tracked by:** Maya (flagged in morning reports as "[KENNETH]")
 
 ---
 

@@ -73,7 +73,7 @@ The owner does not dispatch manually. The agents do it. The owner only makes Tie
 - Retell AI live call handling (configured, not fully tested)
 - Telegram alert delivery (configured, needs live test)
 - Revenue tracking from load records (currently manual)
-- UK market rules not yet built
+- Canada and EU compliance layers not yet built (Year 2)
 
 ---
 
