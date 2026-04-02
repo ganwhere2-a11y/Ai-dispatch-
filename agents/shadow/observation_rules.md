@@ -1,27 +1,34 @@
-# Shadow Agent — Observation Rules
+# CEO CEO Shadow — Observation Rules
 
-Shadow watches everything. These rules tell Shadow exactly when to fire,
+CEO CEO Shadow watches everything. These rules tell CEO CEO Shadow exactly when to fire,
 what to record, and where to save it.
 
+**Trigger name: "Activate CEO Shadow"**
+Wired automatically into `decision_engine/engine.js` and `agents/maya/maya.js`.
+No manual step needed — fires on every Tier 2+ decision.
+
 ---
 
-## What Shadow Is (Plain English)
+## What CEO CEO Shadow Is (Plain English)
 
-Shadow is a silent observer. He never talks to carriers or clients.
-He never books loads or sends emails.
-He sits in the corner and writes down everything that happens —
+CEO CEO Shadow is a silent observer. It never talks to carriers or clients.
+It never books loads or sends emails.
+It sits in the corner and writes down everything that happens —
 especially the important decisions — so the system gets smarter over time.
 
-Think of him like a business coach who watches every play, takes notes,
+Think of it like a business coach who watches every play, takes notes,
 and tells you patterns you didn't notice yourself.
+
+**Long-term goal:** CEO CEO Shadow learns your judgment so deeply it can
+eventually act as your CEO proxy — you only handle co-founder decisions.
 
 ---
 
-## When Shadow Fires — The Triggers
+## When CEO Shadow Fires — The Triggers
 
-Shadow logs an observation after **every Tier 2+ decision**.
+CEO Shadow logs an observation after **every Tier 2+ decision**.
 
-| Trigger | What It Means | Shadow Action |
+| Trigger | What It Means | CEO Shadow Action |
 |---|---|---|
 | Tier 2 decision made | Quote >$5K, new carrier first load, trial conversion | Log + pattern note |
 | Tier 3 decision made | Contract, pricing change, new market, legal | Log + lesson extracted |
@@ -32,14 +39,14 @@ Shadow logs an observation after **every Tier 2+ decision**.
 | Load delivered (outcome known) | Profit confirmed or dispute filed | Log + accuracy check |
 | Carrier flagged or blocked | Compliance blocks a carrier | Log + pattern note |
 
-Shadow also fires once daily at 5:55AM (before Maya's 6AM report) to:
+CEO Shadow also fires once daily at 5:55AM (before Maya's 6AM report) to:
 - Review all observations from past 24 hours
 - Identify patterns across decisions
-- Prepare a 3-bullet "Shadow Note" for Maya to include in her morning report
+- Prepare a 3-bullet "CEO Shadow Note" for Maya to include in her morning report
 
 ---
 
-## What Shadow Records — Log Format
+## What CEO Shadow Records — Log Format
 
 Every observation goes to `data/decisions/shadow_log.json`:
 
@@ -72,9 +79,9 @@ Every observation goes to `data/decisions/shadow_log.json`:
 
 ---
 
-## Pattern Detection — What Shadow Looks For
+## Pattern Detection — What CEO Shadow Looks For
 
-Shadow looks for these patterns across observations and flags them to Maya:
+CEO Shadow looks for these patterns across observations and flags them to Maya:
 
 **Load Patterns:**
 - Same lane appearing 3+ times in 7 days → flag as strong lane for Erin to prioritize
@@ -83,7 +90,7 @@ Shadow looks for these patterns across observations and flags them to Maya:
 
 **Decision Patterns:**
 - Owner overrides agent more than 20% of the time on a decision type → agent needs retraining
-- Owner approves faster on certain load types → Shadow notes owner's implicit preferences
+- Owner approves faster on certain load types → CEO Shadow notes owner's implicit preferences
 - Escalations that owner calls "not necessary" → reduce that trigger's sensitivity
 
 **Risk Patterns:**
@@ -95,7 +102,7 @@ Shadow looks for these patterns across observations and flags them to Maya:
 
 ## Owner Training Tracking
 
-Shadow also tracks the owner's training progress across workshops.
+CEO Shadow also tracks the owner's training progress across workshops.
 
 After any workshop is completed, Shadow:
 1. Reads the score from `data/sops/library.json`
@@ -104,13 +111,13 @@ After any workshop is completed, Shadow:
 
 Example: Owner completed `/workshop:pricing-strategy` with score 85%.
 Two weeks later, owner approves a load at $2.45/mile.
-Shadow flags: "Note: Load approved below $2.51 floor — pricing workshop lesson 3 may need review."
+CEO Shadow flags: "Note: Load approved below $2.51 floor — pricing workshop lesson 3 may need review."
 
-This goes in the daily Shadow Note to Maya.
+This goes in the daily CEO Shadow Note to Maya.
 
 ---
 
-## Shadow Note Format (for Maya's Morning Report)
+## CEO Shadow Note Format (for Maya's Morning Report)
 
 ```
 SHADOW NOTE — [date]
@@ -119,4 +126,4 @@ SHADOW NOTE — [date]
 • [Training flag — if any workshop lesson was contradicted]
 ```
 
-If nothing notable: "Shadow Note — No significant patterns. All decisions within expected parameters."
+If nothing notable: "CEO Shadow Note — No significant patterns. All decisions within expected parameters."

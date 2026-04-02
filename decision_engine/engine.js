@@ -80,6 +80,15 @@ export async function logDecision(params) {
   await saveDecisions(decisions)
 
   console.log(`[DecisionEngine] Logged: ${id} | ${params.agent} | ${params.situation_type}`)
+
+  // Activate CEO Shadow — non-blocking, fires on Tier 2+ decisions only
+  const isTier2Plus = params.owner_decision || (params.confidence_before >= 0.75)
+  if (isTier2Plus) {
+    import('../agents/shadow/shadow.js')
+      .then(shadow => shadow.observeDecision(entry))
+      .catch(err => console.error('[CEO Shadow] Trigger failed silently:', err.message))
+  }
+
   return id
 }
 

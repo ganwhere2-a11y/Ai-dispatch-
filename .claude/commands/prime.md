@@ -25,7 +25,7 @@ AI Dispatch is a 1-person AI-native medical freight dispatch company. 10 autonom
 | **Support** | Client/carrier retention, complaint handling | (node direct) |
 | **Receptionist** | 24/7 Retell AI voice — call routing | `npm run receptionist` |
 | **Marketer** | TikTok/YouTube content calendar | (node direct) |
-| **Shadow** | CEO observer — learns decision patterns, never acts | (node direct) |
+| **CEO Shadow** | Learns your CEO decisions, earns proxy rights over time | `npm run ceo-shadow` |
 | **Maya Intelligence** | Carrier packet knowledge, BDR qualification, kill switch | `/maya intelligence` |
 
 ---

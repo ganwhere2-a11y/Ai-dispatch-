@@ -102,6 +102,22 @@ Always include the Ref ID if provided.`,
     evaluation = { tier: 2, send_now: true, message: `MAYA: ${event.type} — check dashboard`, priority: 'HIGH' }
   }
 
+  // Activate CEO Shadow — observe all Tier 2+ escalations Maya routes
+  if (evaluation.tier >= 2) {
+    import('../shadow/shadow.js')
+      .then(shadow => shadow.observeDecision({
+        id: `esc_${Date.now()}`,
+        situation_type: `escalation_${event.type}`,
+        agent: event.agent,
+        inputs: event.data,
+        recommendation: evaluation.message,
+        owner_decision: null,
+        confidence_before: evaluation.tier === 3 ? 1.0 : 0.8,
+        timestamp: new Date().toISOString()
+      }))
+      .catch(err => console.error('[CEO Shadow] Escalation trigger failed silently:', err.message))
+  }
+
   // Remember this escalation pattern
   await memory.remember({
     key: `escalation_${event.type}`,

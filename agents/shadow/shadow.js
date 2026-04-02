@@ -1,10 +1,10 @@
 /**
- * Shadow Agent
+ * CEO Shadow
  *
  * Watches every decision that flows through the system, learns from patterns,
  * and surfaces proactive recommendations when similar situations arise.
  *
- * The Shadow Agent never acts directly — it observes, learns, and advises.
+ * CEO Shadow never acts directly — it observes, learns, and advises.
  * Think of it as the institutional memory of the business.
  *
  * Core loop:
@@ -17,7 +17,8 @@ import 'dotenv/config'
 import Anthropic from '@anthropic-ai/sdk'
 import { AgentMemory } from '../../shared/memory.js'
 import { logDecision, getSummary } from '../../decision_engine/engine.js'
-import { findSimilar } from '../../decision_engine/matcher.js'
+import { matcher } from '../../decision_engine/matcher.js'
+const { findSimilar } = matcher
 
 const client = new Anthropic()
 const memory = new AgentMemory('Shadow')
@@ -52,16 +53,16 @@ async function loadAllDecisions() {
  */
 export async function observeDecision(decisionRecord) {
   if (process.env.AI_DISPATCH_PAUSED === 'true') {
-    console.log('[Shadow] System paused. observeDecision() aborted.')
+    console.log('[CEO Shadow] System paused. observeDecision() aborted.')
     return { pattern_found: false, insight: null, confidence: 0 }
   }
 
   if (!decisionRecord || !decisionRecord.situation_type) {
-    console.warn('[Shadow] observeDecision() received invalid decision record')
+    console.warn('[CEO Shadow] observeDecision() received invalid decision record')
     return { pattern_found: false, insight: null, confidence: 0 }
   }
 
-  console.log(`[Shadow] Observing decision: ${decisionRecord.id || 'unknown'} — ${decisionRecord.situation_type}`)
+  console.log(`[CEO Shadow] Observing decision: ${decisionRecord.id || 'unknown'} — ${decisionRecord.situation_type}`)
 
   // Store observation in memory
   await memory.remember({
@@ -140,11 +141,11 @@ Analyze these decisions and respond with JSON:
           importance: 4
         })
 
-        console.log(`[Shadow] Pattern found in ${decisionRecord.situation_type}: ${insight}`)
+        console.log(`[CEO Shadow] Pattern found in ${decisionRecord.situation_type}: ${insight}`)
       }
     }
   } catch (err) {
-    console.error(`[Shadow] Pattern extraction failed: ${err.message}`)
+    console.error(`[CEO Shadow] Pattern extraction failed: ${err.message}`)
   }
 
   return { pattern_found, insight, confidence }
@@ -161,17 +162,17 @@ Analyze these decisions and respond with JSON:
  */
 export async function suggestAction(situation) {
   if (process.env.AI_DISPATCH_PAUSED === 'true') {
-    console.log('[Shadow] System paused. suggestAction() aborted.')
+    console.log('[CEO Shadow] System paused. suggestAction() aborted.')
     return { recommendation: 'System paused — no suggestion available', confidence: 0, based_on_count: 0 }
   }
 
   const { situation_type, agent, ...inputs } = situation
 
   if (!situation_type) {
-    throw new Error('[Shadow] suggestAction() requires situation.situation_type')
+    throw new Error('[CEO Shadow] suggestAction() requires situation.situation_type')
   }
 
-  console.log(`[Shadow] Suggesting action for: ${situation_type}`)
+  console.log(`[CEO Shadow] Suggesting action for: ${situation_type}`)
 
   const allDecisions = await loadAllDecisions()
 
@@ -232,7 +233,7 @@ Return JSON:
       }
     }
   } catch (err) {
-    console.error(`[Shadow] suggestAction Claude call failed: ${err.message}`)
+    console.error(`[CEO Shadow] suggestAction Claude call failed: ${err.message}`)
   }
 
   // Fallback to raw matcher result
@@ -251,11 +252,11 @@ Return JSON:
  */
 export async function getDailyInsight() {
   if (process.env.AI_DISPATCH_PAUSED === 'true') {
-    console.log('[Shadow] System paused. getDailyInsight() aborted.')
+    console.log('[CEO Shadow] System paused. getDailyInsight() aborted.')
     return 'System paused — no daily insight available.'
   }
 
-  console.log('[Shadow] Generating daily insight...')
+  console.log('[CEO Shadow] Generating daily insight...')
 
   const allDecisions = await loadAllDecisions()
   const summary = await getSummary()
@@ -296,7 +297,7 @@ Write a 3-5 sentence daily insight paragraph for the owner.`
 
     insight = response.content[0].text.trim()
   } catch (err) {
-    console.error(`[Shadow] getDailyInsight Claude call failed: ${err.message}`)
+    console.error(`[CEO Shadow] getDailyInsight Claude call failed: ${err.message}`)
     insight = `Shadow Agent observed ${recentDecisions.length} decisions in the last 24 hours across ${new Set(recentDecisions.map(d => d.situation_type)).size} situation types. ` +
       `Decision engine total: ${summary.total} decisions logged. ` +
       `Autonomous capabilities unlocked: ${summary.autonomous_eligible}. ` +
@@ -316,7 +317,7 @@ Write a 3-5 sentence daily insight paragraph for the owner.`
 
 if (process.argv[2] === '--daily-insight') {
   getDailyInsight().then(insight => {
-    console.log('[Shadow] Daily Insight:\n')
+    console.log('[CEO Shadow] Daily Insight:\n')
     console.log(insight)
   })
 }

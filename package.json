@@ -21,7 +21,8 @@
     "test:pricing": "node agents/erin/erin.js --test-pricing",
     "test:decision-engine": "node decision_engine/engine.js --test",
     "test:maya-sms": "node agents/maya/maya.js --test-sms",
-    "health": "node scripts/health-check.js"
+    "health": "node scripts/health-check.js",
+    "ceo-shadow": "node agents/shadow/shadow.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
