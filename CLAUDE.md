@@ -26,8 +26,28 @@ She was previously named Daniel. That name is gone. Zero references to Daniel ex
 
 **Do not rename Maya to:**
 - Daniel (was the old name — permanently retired)
-- Assistant, EA, Bot, or any generic name
+- Nova, Assistant, EA, Bot, or any generic name
 - Anything else without explicit owner instruction in writing
+
+---
+
+## OWNER INSTRUCTION GUARDRAILS — READ BEFORE EVERY ACTION
+
+```
+WHEN THE OWNER SAYS "NEVER DO X" OR "DON'T DO X" — THAT IS A PERMANENT RULE.
+NOT A SUGGESTION. NOT A PREFERENCE. A HARD BLOCK.
+LOG IT. ENFORCE IT. NEVER DO IT.
+```
+
+**Active permanent prohibitions (owner-set):**
+1. Never rename Maya to any other name
+2. Never create an agent, file, or feature that manages a specific person's personal truck (FamilyDesk was deleted permanently — do not recreate any version of it)
+3. Never create new agents without following the 6-step checklist in "How to Add a New Agent"
+4. Never modify Iron Rule thresholds in code — they live in `.env` only
+5. Never bypass the Tier system — all Tier 2+ actions must call `evaluateEscalation()` from maya.js
+6. Never push to a branch other than `main` without explicit owner instruction
+
+**If the owner says "never do X" about anything new during a session: add it to this list immediately.**
 
 ---
 
@@ -201,6 +221,18 @@ export async function mainFunction(input) {
   return result
 }
 ```
+
+**Kill Switch Rules — `AI_DISPATCH_PAUSED=true`:**
+
+Setting `AI_DISPATCH_PAUSED=true` in `.env` triggers the following protocol:
+1. **Block all new actions** — no new loads booked, no new emails sent, no new carrier onboarding
+2. **Finish in-flight loads** — any load already picked up continues to delivery (abandoning mid-route damages carrier relationship and violates contracts)
+3. **Maya alerts owner immediately** — Telegram message: what was paused, what is still in motion, ref IDs of in-flight loads
+4. **Resume** — Set `AI_DISPATCH_PAUSED=false` and restart agents
+
+This is implemented in `agents/maya/maya.js` → `evaluateEscalation()`.
+
+---
 
 **Model selection:**
 - `claude-sonnet-4-6` — default for all agents (Erin, Maya, Sales, Support, Receptionist, Onboarding, Compliance, Marketer)

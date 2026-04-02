@@ -165,10 +165,33 @@ async function handleCallAnalyzed(call) {
   const analysis = call.call_analysis
   if (!analysis) return
 
-  // Flag urgent calls that the LLM might have missed
   const transcript = call.transcript || ''
+  const transcriptLower = transcript.toLowerCase()
+
+  // HARD ESCALATION — legal/safety trigger words
+  // If ANY of these appear, immediately escalate to Maya → owner. No exceptions.
+  const legalTriggers = ['lawsuit', 'attorney', 'lawyer', 'sue', 'legal action', 'dot audit', 'accident', 'injury', 'fatality', 'attorney general', 'litigation', 'claim against']
+  const legalHit = legalTriggers.find(k => transcriptLower.includes(k))
+
+  if (legalHit) {
+    await evaluateEscalation({
+      type: 'legal_threat_on_call',
+      agent: 'Receptionist',
+      data: {
+        call_id: call.call_id,
+        trigger_word: legalHit,
+        transcript_summary: analysis.call_summary,
+        caller_number: call.from_number
+      },
+      ref_id: call.call_id
+    })
+    // Do NOT continue processing — this is Tier 3, owner must handle
+    return
+  }
+
+  // Standard urgent flag
   const urgentKeywords = ['emergency', 'urgent', 'surgery', 'patient', 'critical', 'tonight']
-  const isUrgent = urgentKeywords.some(k => transcript.toLowerCase().includes(k))
+  const isUrgent = urgentKeywords.some(k => transcriptLower.includes(k))
 
   if (isUrgent) {
     await evaluateEscalation({

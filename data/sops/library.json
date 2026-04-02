@@ -1,1 +1,80 @@
-{ "workshops_completed": [], "agent_memories": {} }
+{
+  "workshops_completed": [],
+  "workshops": {
+    "dispatch_basics": {
+      "status": "not_started",
+      "score": null,
+      "completed_at": null,
+      "attempts": 0,
+      "shadow_flags": []
+    },
+    "compliance_usa": {
+      "status": "not_started",
+      "score": null,
+      "completed_at": null,
+      "attempts": 0,
+      "shadow_flags": []
+    },
+    "compliance_canada": {
+      "status": "not_started",
+      "score": null,
+      "completed_at": null,
+      "attempts": 0,
+      "shadow_flags": []
+    },
+    "compliance_eu": {
+      "status": "not_started",
+      "score": null,
+      "completed_at": null,
+      "attempts": 0,
+      "shadow_flags": []
+    },
+    "pricing_strategy": {
+      "status": "not_started",
+      "score": null,
+      "completed_at": null,
+      "attempts": 0,
+      "shadow_flags": []
+    },
+    "carrier_vetting": {
+      "status": "not_started",
+      "score": null,
+      "completed_at": null,
+      "attempts": 0,
+      "shadow_flags": []
+    },
+    "trial_to_paid": {
+      "status": "not_started",
+      "score": null,
+      "completed_at": null,
+      "attempts": 0,
+      "shadow_flags": []
+    },
+    "sales_outreach": {
+      "status": "not_started",
+      "score": null,
+      "completed_at": null,
+      "attempts": 0,
+      "shadow_flags": []
+    },
+    "command_center": {
+      "status": "not_started",
+      "score": null,
+      "completed_at": null,
+      "attempts": 0,
+      "shadow_flags": []
+    }
+  },
+  "platform_setup_complete": false,
+  "platform_setup": {
+    "railway": false,
+    "google_cloud": false,
+    "google_drive_brain": false,
+    "claude_projects": false,
+    "airtable": false,
+    "telegram": false,
+    "retell": false,
+    "twilio": false
+  },
+  "agent_memories": {}
+}

@@ -45,8 +45,26 @@ const MAX_TEXTS_PER_10_MIN = 3
  */
 export async function evaluateEscalation(event) {
   if (process.env.AI_DISPATCH_PAUSED === 'true') {
-    await sendAlert('All systems paused. Check Command Center.', 'SYSTEM', 'PAUSED')
-    return
+    // Kill switch layer 2:
+    // - Block all new actions immediately
+    // - Any in-flight load (type: load_*) gets a finish-in-progress flag, not a hard stop
+    // - Owner gets an immediate alert with what was in motion
+    const isInFlight = event.type?.startsWith('load_') && event.data?.status === 'in_progress'
+    if (isInFlight) {
+      await sendAlert(
+        `PAUSED but load ${event.ref_id} is IN FLIGHT — letting it complete. No new actions until resumed.`,
+        'SYSTEM',
+        event.ref_id
+      )
+      // Allow in-flight loads to finish — return without blocking
+      return { paused: true, in_flight: true, ref_id: event.ref_id }
+    }
+    await sendAlert(
+      `SYSTEM PAUSED. All new actions blocked. Check Command Center to resume.`,
+      'SYSTEM',
+      'PAUSED'
+    )
+    return { paused: true, in_flight: false }
   }
 
   // Ask Claude to evaluate the severity and draft the alert message

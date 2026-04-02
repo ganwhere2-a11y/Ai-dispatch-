@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /home/user/Ai-dispatch- && echo '{\"systemMessage\": \"AI DISPATCH SESSION STARTED\\nBranch: '$(git log --oneline -1 2>/dev/null | head -c 60)'\\nAgents: run npm run health for full status\\nType /status for a full system brief or /prime to load full context.\"}' ",
+            "timeout": 10,
+            "statusMessage": "Loading AI Dispatch status..."
+          }
+        ]
+      }
+    ]
+  }
+}
