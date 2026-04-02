@@ -20,7 +20,8 @@
     "test:iron-rules": "node agents/erin/erin.js --test-iron-rules",
     "test:pricing": "node agents/erin/erin.js --test-pricing",
     "test:decision-engine": "node decision_engine/engine.js --test",
-    "test:maya-sms": "node agents/maya/maya.js --test-sms"
+    "test:maya-sms": "node agents/maya/maya.js --test-sms",
+    "health": "node scripts/health-check.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
