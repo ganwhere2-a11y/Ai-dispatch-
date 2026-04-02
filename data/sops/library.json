@@ -76,5 +76,38 @@
     "retell": false,
     "twilio": false
   },
-  "agent_memories": {}
+  "agent_memories": {
+    "Shadow": [
+      {
+        "id": "mem_Shadow_1775147156137",
+        "timestamp": "2026-04-02T16:25:56.137Z",
+        "key": "observed_load_evaluation",
+        "value": "Erin made a load_evaluation decision. Recommendation: REJECT — Iron Rule violation: NO_FLORIDA: Florida loads are permanently blocked. Outcome: pending",
+        "source": "dec_0009",
+        "importance": 2,
+        "recall_count": 0,
+        "last_recalled": null
+      },
+      {
+        "id": "mem_Shadow_1775147156139",
+        "timestamp": "2026-04-02T16:25:56.139Z",
+        "key": "observed_load_evaluation",
+        "value": "Erin made a load_evaluation decision. Recommendation: REJECT — Iron Rule violation: MIN_RPM: $2.3/mile is below $2.51 minimum. Outcome: pending",
+        "source": "dec_0010",
+        "importance": 2,
+        "recall_count": 0,
+        "last_recalled": null
+      },
+      {
+        "id": "mem_Shadow_1775147156140",
+        "timestamp": "2026-04-02T16:25:56.140Z",
+        "key": "observed_load_evaluation",
+        "value": "Erin made a load_evaluation decision. Recommendation: REJECT — Iron Rule violation: MIN_RPM: $2.5/mile is below $2.51 minimum; MAX_DEADHEAD: 200mi exceeds. Outcome: pending",
+        "source": "dec_0011",
+        "importance": 2,
+        "recall_count": 0,
+        "last_recalled": null
+      }
+    ]
+  }
 }
