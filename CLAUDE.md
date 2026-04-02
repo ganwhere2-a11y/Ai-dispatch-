@@ -281,12 +281,12 @@ Follow this checklist exactly:
 
 ## Git
 
-**Active branch:** `claude/ai-dispatcher-system-design-EgN1w`
+**Active branch:** `main`
 
-All work goes on this branch. Do not push to main without explicit owner instruction.
+All work goes on main. It is the only branch.
 
 ```bash
-git push -u origin claude/ai-dispatcher-system-design-EgN1w
+git push -u origin main
 ```
 
 If push fails due to network error: retry up to 4 times with exponential backoff (2s, 4s, 8s, 16s).
