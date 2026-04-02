@@ -41,7 +41,7 @@ LOG IT. ENFORCE IT. NEVER DO IT.
 
 **Active permanent prohibitions (owner-set):**
 1. Never rename Maya to any other name
-2. Never create an agent, file, or feature that manages a specific person's personal truck (FamilyDesk was deleted permanently — do not recreate any version of it)
+2. Never create an agent, file, or feature that manages a specific person's personal truck UNLESS explicitly approved by the owner. **Exception: Uncle Kenneth's truck is approved** — his carrier profile lives in `data/kenneth/`. Do not create any other personal truck space without explicit owner instruction.
 3. Never create new agents without following the 6-step checklist in "How to Add a New Agent"
 4. Never modify Iron Rule thresholds in code — they live in `.env` only
 5. Never bypass the Tier system — all Tier 2+ actions must call `evaluateEscalation()` from maya.js
@@ -53,12 +53,14 @@ LOG IT. ENFORCE IT. NEVER DO IT.
 
 ## What Was Removed — Do Not Recreate
 
-**FamilyDesk** — a family/personal truck management agent that was added without owner request. It has been permanently deleted. Do not add it back, do not create a similar concept, do not create any agent that manages a specific person's personal truck.
+**FamilyDesk** — a family/personal truck management agent that was added without owner request. It has been permanently deleted. Do not add it back under that name or concept.
 
 Removed items:
 - `agents/family_desk/` (entire directory)
 - `data/family/` (entire directory)
 - Any reference to "FamilyDesk", "family_desk", or "family desk"
+
+**Exception approved by owner:** Uncle Kenneth's truck has a dedicated carrier profile at `data/kenneth/kenneth_profile.md`. This is a carrier record inside the existing dispatch system — NOT a new agent. Erin dispatches for him like any other carrier. Maya tracks his loads in morning reports.
 
 ---
 
@@ -359,8 +361,10 @@ The generator (`command_center/generator.js`) pulls live data from agent logs an
 
 ## What This System Is Building Toward
 
-Month 12 target: **200 trucks under management, $68K/week revenue, 3 active markets (USA, Canada, EU).**
+Month 12 target: **200 trucks under management, $68K/week ($272K/month) revenue, 3 active markets (USA, Canada, EU).**
 
-Year 3 target: **500 carrier/fleet companies globally, Shadow Agent fully operational (owner makes minimal decisions), agents handle 90%+ of all actions autonomously.**
+Year 2 target: **Clone system to Canada, EU, UK. 500+ carriers across all countries.**
+
+Year 3 target: **500+ carrier/fleet companies globally, CEO Shadow fully operational (owner makes minimal decisions), agents handle 90%+ of all actions autonomously. "Guardrails" system — fully unbreakable AI rules across all markets.**
 
 Every line of code you write should make the system more autonomous, not less. If you're adding a step that requires owner input for something that could be rule-based, redesign it.
