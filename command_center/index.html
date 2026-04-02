@@ -3,382 +3,190 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ai-Dispatch Command Center</title>
+  <title>AI Dispatch — Command Center</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: #f4f6f9;
-      color: #1a1a2e;
-      max-width: 480px;
-      margin: 0 auto;
-      min-height: 100vh;
-    }
-
-    /* Header */
-    .header {
-      background: #1a1a2e;
-      color: white;
-      padding: 16px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    .header h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
-    .header .sub { font-size: 12px; color: #8892b0; margin-top: 2px; }
-
-    /* Market tabs */
-    .tabs {
-      display: flex;
-      background: #0f3460;
-      border-bottom: 1px solid #162040;
-    }
-    .tab {
-      flex: 1;
-      padding: 10px;
-      text-align: center;
-      color: #8892b0;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      background: none;
-      transition: all 0.2s;
-    }
-    .tab.active {
-      color: white;
-      border-bottom: 2px solid #e94560;
-    }
-    .tab.disabled { opacity: 0.4; cursor: default; }
-
-    /* Market panel */
-    .market-panel { display: none; padding: 12px; }
-    .market-panel.active { display: block; }
-
-    /* Cards */
-    .card {
-      background: white;
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 10px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    .card-title {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #8892b0;
-      margin-bottom: 10px;
-    }
-
-    /* Big stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    .stat-box {
-      background: #f8f9ff;
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-    }
-    .stat-value {
-      font-size: 24px;
-      font-weight: 800;
-      color: #0f3460;
-      line-height: 1;
-    }
-    .stat-value.green { color: #00b894; }
-    .stat-value.yellow { color: #fdcb6e; }
-    .stat-value.red { color: #e94560; }
-    .stat-label {
-      font-size: 11px;
-      color: #8892b0;
-      margin-top: 4px;
-    }
-
-    /* Status bar */
-    .status-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .status-bar.green { background: #d4edda; color: #155724; }
-    .status-bar.yellow { background: #fff3cd; color: #856404; }
-    .status-bar.red { background: #f8d7da; color: #721c24; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .dot.green { background: #28a745; }
-    .dot.yellow { background: #ffc107; }
-    .dot.red { background: #dc3545; }
-
-    /* Attention items */
-    .attention-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .attention-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .attention-text { flex: 1; }
-    .attention-title { font-size: 13px; font-weight: 600; color: #1a1a2e; }
-    .attention-sub { font-size: 12px; color: #8892b0; margin-top: 2px; }
-    .ok-btn {
-      background: #0f3460;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 5px 12px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    /* Erin stats row */
-    .erin-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-      font-size: 13px;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .erin-row:last-child { border-bottom: none; }
-    .erin-label { color: #8892b0; }
-    .erin-value { font-weight: 700; color: #0f3460; }
-
-    /* Iron rule bars */
-    .rule-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 0;
-      font-size: 13px;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .rule-row:last-child { border-bottom: none; }
-    .rule-label { color: #1a1a2e; }
-    .rule-badge {
-      background: #ffeef0;
-      color: #e94560;
-      border-radius: 12px;
-      padding: 2px 8px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .rule-badge.zero {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    /* Maya note */
-    .maya-note {
-      font-size: 13px;
-      line-height: 1.6;
-      color: #444;
-      background: #f8f9ff;
-      border-left: 3px solid #0f3460;
-      padding: 10px 12px;
-      border-radius: 0 8px 8px 0;
-    }
-    .maya-badge {
-      font-size: 11px;
-      font-weight: 700;
-      color: #0f3460;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-    }
-
-    /* Coming soon panel */
-    .coming-soon {
-      text-align: center;
-      padding: 48px 24px;
-      color: #8892b0;
-    }
-    .coming-soon h2 { font-size: 32px; margin-bottom: 8px; }
-    .coming-soon p { font-size: 14px; }
-
-    /* Footer */
-    .footer {
-      text-align: center;
-      font-size: 11px;
-      color: #8892b0;
-      padding: 16px;
-      border-top: 1px solid #eee;
-      margin-top: 8px;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; padding: 16px; max-width: 480px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #2a2d3a; }
+    .header h1 { font-size: 18px; font-weight: 700; color: #fff; }
+    .header .date { font-size: 12px; color: #888; }
+    .context-bar { display: flex; gap: 8px; margin-bottom: 20px; }
+    .ctx-btn { padding: 6px 16px; border-radius: 20px; border: 1px solid #2a2d3a; background: #1a1d27; color: #888; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+    .ctx-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .section { background: #1a1d27; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 12px; }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .metric { text-align: center; }
+    .metric .value { font-size: 28px; font-weight: 700; color: #fff; }
+    .metric .label { font-size: 11px; color: #666; margin-top: 2px; }
+    .metric .trend { font-size: 11px; margin-top: 2px; }
+    .trend-up { color: #22c55e; }
+    .trend-down { color: #ef4444; }
+    .priority-list { list-style: none; }
+    .priority-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #2a2d3a; }
+    .priority-item:last-child { border-bottom: none; }
+    .priority-num { width: 22px; height: 22px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+    .priority-text { font-size: 13px; line-height: 1.4; }
+    .action-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #2a2d3a; }
+    .action-item:last-child { border-bottom: none; }
+    .action-text { font-size: 13px; flex: 1; }
+    .action-btns { display: flex; gap: 6px; }
+    .btn { padding: 5px 12px; border-radius: 6px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-approve { background: #22c55e; color: #000; }
+    .btn-reject { background: #ef4444; color: #fff; }
+    .status-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2d3a; font-size: 13px; }
+    .status-row:last-child { border-bottom: none; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .dot-green { background: #22c55e; }
+    .dot-yellow { background: #eab308; }
+    .dot-red { background: #ef4444; }
+    .all-good { color: #22c55e; text-align: center; font-size: 13px; padding: 8px 0; }
+    .iron-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .iron-stat { text-align: center; background: #0f1117; border-radius: 8px; padding: 8px; }
+    .iron-stat .num { font-size: 20px; font-weight: 700; color: #ef4444; }
+    .iron-stat .lbl { font-size: 10px; color: #666; margin-top: 2px; }
+    footer { text-align: center; font-size: 11px; color: #444; margin-top: 20px; padding-top: 12px; border-top: 1px solid #2a2d3a; }
   </style>
 </head>
 <body>
-
-<div class="header">
-  <h1>Ai-Dispatch OS</h1>
-  <div class="sub">Command Center — Maya v1.0</div>
-</div>
-
-<div class="tabs">
-  <button class="tab active" onclick="switchTab('usa')">USA</button>
-  <button class="tab disabled" onclick="switchTab('canada')">Canada</button>
-  <button class="tab disabled" onclick="switchTab('eu')">EU</button>
-</div>
-
-<!-- USA Panel -->
-<div id="panel-usa" class="market-panel active">
-
-  <!-- Business State -->
-  <div style="padding: 12px 0 0 0;">
-    <div class="status-bar yellow">
-      <div class="dot yellow"></div>
-      Yellow — Revenue at 74% of weekly target. 2 decisions need your approval.
-    </div>
+  <div class="header">
+    <h1>Command Center</h1>
+    <div class="date">Thursday, April 2 — 05:01 PM</div>
   </div>
 
-  <!-- Big Numbers -->
-  <div class="card">
-    <div class="card-title">Business State</div>
-    <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-value green">9</div>
-        <div class="stat-label">Active Loads</div>
+  <div class="context-bar">
+    <button class="ctx-btn active">🇺🇸 USA</button>
+    <button class="ctx-btn ">🇨🇦 Canada</button>
+    <button class="ctx-btn ">🇪🇺 Europe</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Business State</div>
+    <div class="metric-grid">
+      <div class="metric">
+        <div class="value">7</div>
+        <div class="label">Active Loads</div>
+        <div class="trend trend-up">11 decisions this week</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-value">$6,320</div>
-        <div class="stat-label">Revenue This Week</div>
+      <div class="metric">
+        <div class="value">$11,240</div>
+        <div class="label">Revenue This Week</div>
+        <div class="trend trend-up">↑ $1,440 vs last week</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-value">7</div>
-        <div class="stat-label">Trucks Under Mgmt</div>
+      <div class="metric">
+        <div class="value">4</div>
+        <div class="label">Trucks Under Mgmt</div>
+        <div class="trend trend-up">Year goal: 200</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-value yellow">3</div>
-        <div class="stat-label">Trial Prospects</div>
+      <div class="metric">
+        <div class="value">3</div>
+        <div class="label">Trial Prospects</div>
+        <div class="trend trend-up">3 active</div>
       </div>
     </div>
   </div>
 
-  <!-- Needs Your Attention -->
-  <div class="card">
-    <div class="card-title">Needs Your Attention</div>
+  <div class="section">
+    <div class="section-title">Today's Priority List</div>
+    <ul class="priority-list">
+      <li class="priority-item">
+      <div class="priority-num">1</div>
+      <div class="priority-text">Carrier MC-884421 — authority age 172 days, approaching 180-day threshold</div>
+    </li>
+<li class="priority-item">
+      <div class="priority-num">2</div>
+      <div class="priority-text">Load #1047 (Chicago to Dallas, 892mi) — awaiting carrier confirmation</div>
+    </li>
+<li class="priority-item">
+      <div class="priority-num">3</div>
+      <div class="priority-text">Trial carrier TruckPro LLC — Day 5 of 7, conversion call due today</div>
+    </li>
+<li class="priority-item">
+      <div class="priority-num">4</div>
+      <div class="priority-text">Sales: 14 new FMCSA leads scraped — outreach sequence queued</div>
+    </li>
+<li class="priority-item">
+      <div class="priority-num">5</div>
+      <div class="priority-text">Weekly review scheduled — CEO Shadow generating pattern report</div>
+    </li>
+    </ul>
+  </div>
 
-    <div class="attention-item">
-      <div class="dot red" style="margin-top:4px;"></div>
-      <div class="attention-text">
-        <div class="attention-title">MedTrans LLC — Trial Day 7</div>
-        <div class="attention-sub">Conversion due today. Approve to send DocuSign.</div>
+  <div class="section">
+    <div class="section-title">Needs Your Decision</div>
+    <div class="action-item">
+        <div class="action-text">Quote $5,400 — Chicago to Memphis, 487mi @ $3.20/RPM. New carrier first load. Needs your sign-off.</div>
+        <div class="action-btns">
+          <button class="btn btn-approve" onclick="approve('esc_001')">Approve</button>
+          <button class="btn btn-reject" onclick="reject('esc_001')">Reject</button>
+        </div>
       </div>
-      <button class="ok-btn">OK</button>
-    </div>
-
-    <div class="attention-item">
-      <div class="dot yellow" style="margin-top:4px;"></div>
-      <div class="attention-text">
-        <div class="attention-title">Sunrise Express — First Load</div>
-        <div class="attention-sub">New carrier. Passed all checks. Needs your sign-off.</div>
+<div class="action-item">
+        <div class="action-text">TruckPro LLC trial conversion — upgrade to paid at $350/mo? Carrier has 3 clean loads.</div>
+        <div class="action-btns">
+          <button class="btn btn-approve" onclick="approve('esc_002')">Approve</button>
+          <button class="btn btn-reject" onclick="reject('esc_002')">Reject</button>
+        </div>
       </div>
-      <button class="ok-btn">OK</button>
-    </div>
+  </div>
 
-    <div class="attention-item">
-      <div class="dot green" style="margin-top:4px;"></div>
-      <div class="attention-text">
-        <div class="attention-title">4 Outreach Replies</div>
-        <div class="attention-sub">Sales logged responses. No action needed — info only.</div>
-      </div>
-      <button class="ok-btn">OK</button>
+  <div class="section">
+    <div class="section-title">Iron Rule Activity (This Week)</div>
+    <div class="iron-stats">
+      <div class="iron-stat"><div class="num">2</div><div class="lbl">No Florida</div></div>
+      <div class="iron-stat"><div class="num">5</div><div class="lbl">Low RPM</div></div>
+      <div class="iron-stat"><div class="num">1</div><div class="lbl">Deadhead</div></div>
+      <div class="iron-stat"><div class="num">0</div><div class="lbl">Weight</div></div>
     </div>
   </div>
 
-  <!-- Erin Yesterday -->
-  <div class="card">
-    <div class="card-title">Erin Yesterday</div>
-    <div class="erin-row">
-      <span class="erin-label">Loads Booked</span>
-      <span class="erin-value">4</span>
+  <div class="section">
+    <div class="section-title">Agent Status</div>
+    <div class="status-row">
+      <span><span class="status-dot dot-green"></span>Maya</span>
+      <span style="color: #888; font-size: 12px;">Morning report sent 6:02AM</span>
     </div>
-    <div class="erin-row">
-      <span class="erin-label">Loads Rejected</span>
-      <span class="erin-value" style="color:#e94560;">3</span>
+<div class="status-row">
+      <span><span class="status-dot dot-green"></span>Erin</span>
+      <span style="color: #888; font-size: 12px;">7 active loads</span>
     </div>
-    <div class="erin-row">
-      <span class="erin-label">Revenue Locked In</span>
-      <span class="erin-value">$2,840</span>
+<div class="status-row">
+      <span><span class="status-dot dot-green"></span>Receptionist</span>
+      <span style="color: #888; font-size: 12px;">3 calls handled today</span>
     </div>
-    <div class="erin-row">
-      <span class="erin-label">Avg RPM (booked)</span>
-      <span class="erin-value">$3.12</span>
+<div class="status-row">
+      <span><span class="status-dot dot-green"></span>Sales</span>
+      <span style="color: #888; font-size: 12px;">14 leads in pipeline</span>
     </div>
-  </div>
-
-  <!-- Iron Rule Activity -->
-  <div class="card">
-    <div class="card-title">Iron Rule Activity</div>
-    <div class="rule-row">
-      <span class="rule-label">No Florida loads</span>
-      <span class="rule-badge">1 rejected</span>
+<div class="status-row">
+      <span><span class="status-dot dot-green"></span>Compliance</span>
+      <span style="color: #888; font-size: 12px;">All carriers vetted</span>
     </div>
-    <div class="rule-row">
-      <span class="rule-label">RPM below $2.51</span>
-      <span class="rule-badge">1 rejected</span>
+<div class="status-row">
+      <span><span class="status-dot dot-green"></span>Onboarding</span>
+      <span style="color: #888; font-size: 12px;">3 trials active</span>
     </div>
-    <div class="rule-row">
-      <span class="rule-label">Deadhead exceeded</span>
-      <span class="rule-badge">1 rejected</span>
-    </div>
-    <div class="rule-row">
-      <span class="rule-label">Weight over 48,000 lbs</span>
-      <span class="rule-badge zero">0</span>
+<div class="status-row">
+      <span><span class="status-dot dot-green"></span>Support</span>
+      <span style="color: #888; font-size: 12px;">No open complaints</span>
     </div>
   </div>
 
-  <!-- Maya's Note -->
-  <div class="card">
-    <div class="maya-badge">Maya's Note</div>
-    <div class="maya-note">
-      We're at 74% of the weekly revenue target with two days left. The MedTrans conversion today is the most important item — that alone adds $240 to weekly commission and locks in a regular carrier. Erin's load quality is strong (avg $3.12 RPM on booked loads). The 3 Iron Rule rejections were all correct calls. Blue Ridge Freight is on Day 3 of their trial and showing good engagement — keep an eye on them for a strong conversion next week.
-    </div>
+  <div class="section">
+    <div class="section-title">Anything Wrong</div>
+    <div class="all-good">All systems running. No flags.</div>
   </div>
 
-</div>
+  <footer>Generated by Maya at 5:01:37 PM | AI Dispatch OS</footer>
 
-<!-- Canada Panel -->
-<div id="panel-canada" class="market-panel">
-  <div class="coming-soon">
-    <h2>🇨🇦</h2>
-    <p><strong>Canada — Phase 2</strong><br>Launching Month 6. Transport Canada compliance module in development.</p>
-  </div>
-</div>
-
-<!-- EU Panel -->
-<div id="panel-eu" class="market-panel">
-  <div class="coming-soon">
-    <h2>🇪🇺</h2>
-    <p><strong>EU — Phase 3</strong><br>Launching Month 12. EU GDP compliance module in development.</p>
-  </div>
-</div>
-
-<div class="footer">
-  Last updated: <span id="timestamp"></span> &nbsp;|&nbsp; Run <code>npm run command-center</code> to refresh
-</div>
-
-<script>
-  document.getElementById('timestamp').textContent = new Date().toLocaleString()
-
-  function switchTab(market) {
-    if (market === 'canada' || market === 'eu') return
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
-    document.querySelectorAll('.market-panel').forEach(p => p.classList.remove('active'))
-    event.target.classList.add('active')
-    document.getElementById('panel-' + market).classList.add('active')
-  }
-</script>
-
+  <script>
+    // Context switching
+    document.querySelectorAll('.ctx-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.ctx-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+      })
+    })
+  </script>
 </body>
 </html>
