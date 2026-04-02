@@ -11,7 +11,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { AgentMemory } from '../../shared/memory.js'
 import { logDecision, getConfidence } from '../../decision_engine/engine.js'
 import { vetCarrier, checkLoad } from '../compliance/compliance.js'
-import { evaluateEscalation } from '../daniel/daniel.js'
+import { evaluateEscalation } from '../maya/maya.js'
 
 const client = new Anthropic()
 const memory = new AgentMemory('Erin')
@@ -216,7 +216,7 @@ export async function evaluateLoad(load) {
     return {
       accepted: false,
       reason: 'escalated',
-      message: `Client rate $${rateCalc.clientRate} exceeds threshold. Daniel notified. Awaiting owner approval.`,
+      message: `Client rate $${rateCalc.clientRate} exceeds threshold. Maya notified. Awaiting owner approval.`,
       rate_calc: rateCalc,
       profit: profitCalc
     }

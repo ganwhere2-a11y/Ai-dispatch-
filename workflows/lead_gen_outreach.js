@@ -17,7 +17,7 @@ import Airtable from 'airtable'
 import fetch from 'node-fetch'
 import { AgentMemory } from '../shared/memory.js'
 import { logDecision } from '../decision_engine/engine.js'
-import { evaluateEscalation } from '../agents/daniel/daniel.js'
+import { evaluateEscalation } from '../agents/maya/maya.js'
 
 const client = new Anthropic()
 const memory = new AgentMemory('Sales')
@@ -504,7 +504,7 @@ export async function runOutreachSequence() {
 
   console.log(`[lead_gen] Outreach sequence complete — sent ${sent} emails`)
 
-  // Notify Daniel if we sent emails (Tier 1 — morning report)
+  // Notify Maya if we sent emails (Tier 1 — morning report)
   if (sent > 0) {
     await evaluateEscalation({
       type: 'outreach_batch_sent',

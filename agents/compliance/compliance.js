@@ -9,7 +9,7 @@ import 'dotenv/config'
 import Anthropic from '@anthropic-ai/sdk'
 import { AgentMemory } from '../../shared/memory.js'
 import { logDecision } from '../../decision_engine/engine.js'
-import { evaluateEscalation } from '../daniel/daniel.js'
+import { evaluateEscalation } from '../maya/maya.js'
 
 const client = new Anthropic()
 const memory = new AgentMemory('Compliance')
@@ -66,7 +66,7 @@ export async function vetCarrier(carrier) {
       flags.push(`BLOCKED: Insurance expired on ${carrier.insurance_exp_date}`)
     } else if (daysUntilExpiry < 30) {
       flags.push(`WARNING: Insurance expires in ${Math.round(daysUntilExpiry)} days — alert owner`)
-      // Notify Daniel
+      // Notify Maya
       await evaluateEscalation({
         type: 'insurance_expiring',
         agent: 'Compliance',

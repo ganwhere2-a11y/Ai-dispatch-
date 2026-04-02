@@ -1,15 +1,15 @@
-# Daniel — Escalation Rules
+# Maya — Escalation Rules
 
 ## Tier System
 
-All agents route escalations to Daniel. Daniel routes to owner if Tier 2+.
+All agents route escalations to Maya. Maya routes to owner if Tier 2+.
 
-| Tier | What It Is | Daniel's Action |
+| Tier | What It Is | Maya's Action |
 |---|---|---|
-| 0 | Agent reads data, searches, drafts | Auto — Daniel not involved |
-| 1 | Agent sends email, updates Airtable, sends standard docs | Auto + logged — Daniel reviews in morning |
-| 2 | Quote >$5K, new carrier first load, trial conversion, factoring submission | Daniel texts owner immediately (business hours) or includes in 6AM report (overnight) |
-| 3 | Contract signing, pricing changes, refunds, new market launch | Daniel texts owner immediately regardless of time |
+| 0 | Agent reads data, searches, drafts | Auto — Maya not involved |
+| 1 | Agent sends email, updates Airtable, sends standard docs | Auto + logged — Maya reviews in morning |
+| 2 | Quote >$5K, new carrier first load, trial conversion, factoring submission | Maya texts owner immediately (business hours) or includes in 6AM report (overnight) |
+| 3 | Contract signing, pricing changes, refunds, new market launch | Maya texts owner immediately regardless of time |
 
 ## Escalation Triggers by Agent
 
@@ -31,7 +31,7 @@ All agents route escalations to Daniel. Daniel routes to owner if Tier 2+.
 - Prospect is a large fleet (10+ trucks) → Tier 2 (flag as high value)
 
 ### From Onboarding
-- Trial carrier MC# check fails → Tier 1 (Support handles, Daniel logs)
+- Trial carrier MC# check fails → Tier 1 (Support handles, Maya logs)
 - Trial day 7 — client has not converted → Tier 2 (flag for owner decision)
 - New paid client signed → Tier 1 (good news — include in morning report)
 
@@ -48,4 +48,4 @@ All agents route escalations to Daniel. Daniel routes to owner if Tier 2+.
 - Maximum 3 urgent texts in any 10-minute period
 - If 4th escalation arrives within 10 min → bundle into one text: "Multiple issues — check Telegram"
 - Overnight (10PM-6AM): Only Tier 3 events get immediate texts. Everything else waits for 6AM report.
-- If AI_DISPATCH_PAUSED=true → Daniel sends ONE text: "All systems paused. Check Command Center."
+- If AI_DISPATCH_PAUSED=true → Maya sends ONE text: "All systems paused. Check Command Center."

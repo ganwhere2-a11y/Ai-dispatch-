@@ -20,7 +20,7 @@ Stored in env as COST_PER_MILE. Can be updated if fuel prices change significant
 | Negative | LOSS | Auto-reject. Log reason. Do NOT present to owner or carrier. |
 | $0 - $199 | BORDERLINE | Reject. Only accept if it's part of a multi-load deal or strategic lane. |
 | $200 - $399 | DECENT | Accept. Standard load. Log and proceed. |
-| $400+ | STRONG | Prioritize. Book first. Flag as high-value to Daniel's morning report. |
+| $400+ | STRONG | Prioritize. Book first. Flag as high-value to Maya's morning report. |
 
 ## The Three Worked Examples (From Training)
 

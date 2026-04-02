@@ -5,7 +5,7 @@
  * trials), gets a Decision Engine summary, generates the report via Claude,
  * and sends it to the owner via Telegram.
  *
- * This is the owner's daily briefing. Daniel generates it.
+ * This is the owner's daily briefing. Maya generates it.
  *
  * Cron: 0 6 * * * (6AM every day, America/Chicago)
  */
@@ -13,9 +13,9 @@
 import 'dotenv/config'
 import cron from 'node-cron'
 import Airtable from 'airtable'
-import { sendMorningReport } from '../agents/daniel/daniel.js'
+import { sendMorningReport } from '../agents/maya/maya.js'
 import { getSummary as getDecisionSummary } from '../decision_engine/engine.js'
-import { evaluateEscalation } from '../agents/daniel/daniel.js'
+import { evaluateEscalation } from '../agents/maya/maya.js'
 
 const airtableBase = process.env.AIRTABLE_BASE_ID
   ? new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID)
@@ -214,7 +214,7 @@ async function getErinYesterdayData() {
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
 /**
- * Generate and send Daniel's morning report.
+ * Generate and send Maya's morning report.
  * Pulls all data, generates report via Claude, sends via Telegram.
  */
 export async function generateAndSendReport() {
@@ -229,7 +229,7 @@ export async function generateAndSendReport() {
     getDecisionSummary()
   ])
 
-  // Compile business data for Daniel
+  // Compile business data for Maya
   const businessData = {
     date: new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
     activeLoads: activeLoads.active_count,
@@ -277,7 +277,7 @@ export async function generateAndSendReport() {
     })
   }
 
-  // Send report via Daniel
+  // Send report via Maya
   const report = await sendMorningReport(businessData)
 
   console.log('[morning_report] Report sent successfully')

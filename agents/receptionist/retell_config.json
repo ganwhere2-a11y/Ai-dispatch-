@@ -36,7 +36,7 @@
       {
         "type": "custom",
         "name": "escalate_to_daniel",
-        "description": "Escalate an urgent call to Daniel for immediate owner SMS alert",
+        "description": "Escalate an urgent call to Maya for immediate owner SMS alert",
         "url": "https://YOUR_DOMAIN/functions/escalate",
         "parameters": {
           "type": "object",

@@ -1,7 +1,7 @@
 /**
  * Command Center Generator
  *
- * Daniel calls this every morning at 6AM to build the HTML dashboard.
+ * Maya calls this every morning at 6AM to build the HTML dashboard.
  * Pulls live data from Airtable, formats it, and generates index.html.
  *
  * Simple version: Like a newspaper printing press — every morning it
@@ -63,7 +63,7 @@ export async function generateCommandCenter(data = {}) {
     : '<div class="all-good">No decisions needed today</div>'
 
   // Build agent status HTML
-  const agentNames = ['Daniel', 'Erin', 'Receptionist', 'Sales', 'Compliance', 'Onboarding', 'Support']
+  const agentNames = ['Maya', 'Erin', 'Receptionist', 'Sales', 'Compliance', 'Onboarding', 'Support']
   const agentStatusHTML = agentNames.map(name => {
     const status = businessData.agentStatuses.find(s => s.name === name)
     const statusColor = status?.ok !== false ? 'dot-green' : 'dot-red'

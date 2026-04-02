@@ -162,7 +162,7 @@ export class AgentMemory {
   }
 
   /**
-   * Get all memories for this agent (for Daniel's summary report).
+   * Get all memories for this agent (for Maya's summary report).
    */
   async getAllMemories() {
     const library = await this._loadLibrary()

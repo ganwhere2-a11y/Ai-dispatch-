@@ -22,7 +22,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { AgentMemory } from '../../shared/memory.js'
 import { logDecision } from '../../decision_engine/engine.js'
-import { evaluateEscalation } from '../daniel/daniel.js'
+import { evaluateEscalation } from '../maya/maya.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const LEADS_FILE = path.join(__dirname, '../../data/sales/leads.json')
@@ -228,7 +228,7 @@ export async function runOutreachSequence() {
 
     const emailContent = template(lead)
 
-    // Step 3 (last_chance) escalates through Daniel for awareness
+    // Step 3 (last_chance) escalates through Maya for awareness
     if (step === 3) {
       await evaluateEscalation({
         type: 'outreach_last_chance',

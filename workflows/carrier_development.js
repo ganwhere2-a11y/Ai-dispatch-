@@ -20,7 +20,7 @@ import cron from 'node-cron'
 import Airtable from 'airtable'
 import { vetCarrier } from '../agents/compliance/compliance.js'
 import { logDecision } from '../decision_engine/engine.js'
-import { evaluateEscalation } from '../agents/daniel/daniel.js'
+import { evaluateEscalation } from '../agents/maya/maya.js'
 
 const client = new Anthropic()
 

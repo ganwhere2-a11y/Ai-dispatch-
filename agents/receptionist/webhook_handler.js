@@ -8,7 +8,7 @@
 import 'dotenv/config'
 import express from 'express'
 import { AgentMemory } from '../../shared/memory.js'
-import { evaluateEscalation } from '../daniel/daniel.js'
+import { evaluateEscalation } from '../maya/maya.js'
 
 const app = express()
 app.use(express.json())
@@ -87,7 +87,7 @@ app.post('/functions/book-calendly', async (req, res) => {
   }
 })
 
-// Daniel escalation
+// Maya escalation
 app.post('/functions/escalate', async (req, res) => {
   const { caller_name, caller_phone, urgency_reason, issue_description } = req.body
 

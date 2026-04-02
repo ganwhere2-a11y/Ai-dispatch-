@@ -4,7 +4,7 @@
 
 | Month | Trucks | Loads/Wk | Revenue/Wk | Key Milestone |
 |---|---|---|---|---|
-| 1 | 5 | 5 | $2,000 | First 5 carriers onboarded, Retell live, Daniel 6AM active |
+| 1 | 5 | 5 | $2,000 | First 5 carriers onboarded, Retell live, Maya 6AM active |
 | 2 | 15 | 12 | $5,000 | Factoring active, Sales agent running, first paid clients |
 | 3 | 30 | 20 | $9,000 | 10% rate kicks in for Month 1 carriers, Decision Engine learning |
 | 4 | 50 | 30 | $14,000 | First direct medical facility contracts, Shadow patterns emerging |
@@ -28,7 +28,7 @@ By Year 3, the system should be handling:
 ## Quarterly Check-ins
 
 **Q1 (Months 1-3):** Is the USA operation working? Are Iron Rules holding? Is Erin booking profitable loads?
-**Q2 (Months 4-6):** Is revenue growing week-over-week? Is the trial funnel converting? Is Daniel reducing owner interruptions?
+**Q2 (Months 4-6):** Is revenue growing week-over-week? Is the trial funnel converting? Is Maya reducing owner interruptions?
 **Q3 (Months 7-9):** Canada live and profitable? Is the Decision Engine earning autonomous capability on core load types?
 **Q4 (Months 10-12):** EU pilot working? Is Shadow Agent making the owner's days easier?
 

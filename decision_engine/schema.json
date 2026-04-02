@@ -2,7 +2,7 @@
   "decision_schema": {
     "id": "string — unique ID, e.g. dec_001",
     "timestamp": "ISO 8601 datetime",
-    "agent": "string — Daniel | Erin | Sales | Compliance | Onboarding | Support | Marketer | Shadow | FamilyDesk",
+    "agent": "string — Maya | Erin | Sales | Compliance | Onboarding | Support | Marketer | Shadow | FamilyDesk",
     "context": "string — USA | CANADA | EUROPE",
     "situation_type": "string — see situation_types below",
     "inputs": "object — all data available at decision time",

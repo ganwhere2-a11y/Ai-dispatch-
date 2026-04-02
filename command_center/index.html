@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ai-Dispatch Command Center</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #f4f6f9;
+      color: #1a1a2e;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: #1a1a2e;
+      color: white;
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+    .header .sub { font-size: 12px; color: #8892b0; margin-top: 2px; }
+
+    /* Market tabs */
+    .tabs {
+      display: flex;
+      background: #0f3460;
+      border-bottom: 1px solid #162040;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      color: #8892b0;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: none;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      color: white;
+      border-bottom: 2px solid #e94560;
+    }
+    .tab.disabled { opacity: 0.4; cursor: default; }
+
+    /* Market panel */
+    .market-panel { display: none; padding: 12px; }
+    .market-panel.active { display: block; }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .card-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #8892b0;
+      margin-bottom: 10px;
+    }
+
+    /* Big stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .stat-box {
+      background: #f8f9ff;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f3460;
+      line-height: 1;
+    }
+    .stat-value.green { color: #00b894; }
+    .stat-value.yellow { color: #fdcb6e; }
+    .stat-value.red { color: #e94560; }
+    .stat-label {
+      font-size: 11px;
+      color: #8892b0;
+      margin-top: 4px;
+    }
+
+    /* Status bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .status-bar.green { background: #d4edda; color: #155724; }
+    .status-bar.yellow { background: #fff3cd; color: #856404; }
+    .status-bar.red { background: #f8d7da; color: #721c24; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot.green { background: #28a745; }
+    .dot.yellow { background: #ffc107; }
+    .dot.red { background: #dc3545; }
+
+    /* Attention items */
+    .attention-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .attention-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .attention-text { flex: 1; }
+    .attention-title { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+    .attention-sub { font-size: 12px; color: #8892b0; margin-top: 2px; }
+    .ok-btn {
+      background: #0f3460;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Erin stats row */
+    .erin-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .erin-row:last-child { border-bottom: none; }
+    .erin-label { color: #8892b0; }
+    .erin-value { font-weight: 700; color: #0f3460; }
+
+    /* Iron rule bars */
+    .rule-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .rule-row:last-child { border-bottom: none; }
+    .rule-label { color: #1a1a2e; }
+    .rule-badge {
+      background: #ffeef0;
+      color: #e94560;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .rule-badge.zero {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    /* Maya note */
+    .maya-note {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #444;
+      background: #f8f9ff;
+      border-left: 3px solid #0f3460;
+      padding: 10px 12px;
+      border-radius: 0 8px 8px 0;
+    }
+    .maya-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #0f3460;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    /* Coming soon panel */
+    .coming-soon {
+      text-align: center;
+      padding: 48px 24px;
+      color: #8892b0;
+    }
+    .coming-soon h2 { font-size: 32px; margin-bottom: 8px; }
+    .coming-soon p { font-size: 14px; }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      color: #8892b0;
+      padding: 16px;
+      border-top: 1px solid #eee;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Ai-Dispatch OS</h1>
+  <div class="sub">Command Center — Maya v1.0</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('usa')">USA</button>
+  <button class="tab disabled" onclick="switchTab('canada')">Canada</button>
+  <button class="tab disabled" onclick="switchTab('eu')">EU</button>
+</div>
+
+<!-- USA Panel -->
+<div id="panel-usa" class="market-panel active">
+
+  <!-- Business State -->
+  <div style="padding: 12px 0 0 0;">
+    <div class="status-bar yellow">
+      <div class="dot yellow"></div>
+      Yellow — Revenue at 74% of weekly target. 2 decisions need your approval.
+    </div>
+  </div>
+
+  <!-- Big Numbers -->
+  <div class="card">
+    <div class="card-title">Business State</div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-value green">9</div>
+        <div class="stat-label">Active Loads</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">$6,320</div>
+        <div class="stat-label">Revenue This Week</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">7</div>
+        <div class="stat-label">Trucks Under Mgmt</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value yellow">3</div>
+        <div class="stat-label">Trial Prospects</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Needs Your Attention -->
+  <div class="card">
+    <div class="card-title">Needs Your Attention</div>
+
+    <div class="attention-item">
+      <div class="dot red" style="margin-top:4px;"></div>
+      <div class="attention-text">
+        <div class="attention-title">MedTrans LLC — Trial Day 7</div>
+        <div class="attention-sub">Conversion due today. Approve to send DocuSign.</div>
+      </div>
+      <button class="ok-btn">OK</button>
+    </div>
+
+    <div class="attention-item">
+      <div class="dot yellow" style="margin-top:4px;"></div>
+      <div class="attention-text">
+        <div class="attention-title">Sunrise Express — First Load</div>
+        <div class="attention-sub">New carrier. Passed all checks. Needs your sign-off.</div>
+      </div>
+      <button class="ok-btn">OK</button>
+    </div>
+
+    <div class="attention-item">
+      <div class="dot green" style="margin-top:4px;"></div>
+      <div class="attention-text">
+        <div class="attention-title">4 Outreach Replies</div>
+        <div class="attention-sub">Sales logged responses. No action needed — info only.</div>
+      </div>
+      <button class="ok-btn">OK</button>
+    </div>
+  </div>
+
+  <!-- Erin Yesterday -->
+  <div class="card">
+    <div class="card-title">Erin Yesterday</div>
+    <div class="erin-row">
+      <span class="erin-label">Loads Booked</span>
+      <span class="erin-value">4</span>
+    </div>
+    <div class="erin-row">
+      <span class="erin-label">Loads Rejected</span>
+      <span class="erin-value" style="color:#e94560;">3</span>
+    </div>
+    <div class="erin-row">
+      <span class="erin-label">Revenue Locked In</span>
+      <span class="erin-value">$2,840</span>
+    </div>
+    <div class="erin-row">
+      <span class="erin-label">Avg RPM (booked)</span>
+      <span class="erin-value">$3.12</span>
+    </div>
+  </div>
+
+  <!-- Iron Rule Activity -->
+  <div class="card">
+    <div class="card-title">Iron Rule Activity</div>
+    <div class="rule-row">
+      <span class="rule-label">No Florida loads</span>
+      <span class="rule-badge">1 rejected</span>
+    </div>
+    <div class="rule-row">
+      <span class="rule-label">RPM below $2.51</span>
+      <span class="rule-badge">1 rejected</span>
+    </div>
+    <div class="rule-row">
+      <span class="rule-label">Deadhead exceeded</span>
+      <span class="rule-badge">1 rejected</span>
+    </div>
+    <div class="rule-row">
+      <span class="rule-label">Weight over 48,000 lbs</span>
+      <span class="rule-badge zero">0</span>
+    </div>
+  </div>
+
+  <!-- Maya's Note -->
+  <div class="card">
+    <div class="maya-badge">Maya's Note</div>
+    <div class="maya-note">
+      We're at 74% of the weekly revenue target with two days left. The MedTrans conversion today is the most important item — that alone adds $240 to weekly commission and locks in a regular carrier. Erin's load quality is strong (avg $3.12 RPM on booked loads). The 3 Iron Rule rejections were all correct calls. Blue Ridge Freight is on Day 3 of their trial and showing good engagement — keep an eye on them for a strong conversion next week.
+    </div>
+  </div>
+
+</div>
+
+<!-- Canada Panel -->
+<div id="panel-canada" class="market-panel">
+  <div class="coming-soon">
+    <h2>🇨🇦</h2>
+    <p><strong>Canada — Phase 2</strong><br>Launching Month 6. Transport Canada compliance module in development.</p>
+  </div>
+</div>
+
+<!-- EU Panel -->
+<div id="panel-eu" class="market-panel">
+  <div class="coming-soon">
+    <h2>🇪🇺</h2>
+    <p><strong>EU — Phase 3</strong><br>Launching Month 12. EU GDP compliance module in development.</p>
+  </div>
+</div>
+
+<div class="footer">
+  Last updated: <span id="timestamp"></span> &nbsp;|&nbsp; Run <code>npm run command-center</code> to refresh
+</div>
+
+<script>
+  document.getElementById('timestamp').textContent = new Date().toLocaleString()
+
+  function switchTab(market) {
+    if (market === 'canada' || market === 'eu') return
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+    document.querySelectorAll('.market-panel').forEach(p => p.classList.remove('active'))
+    event.target.classList.add('active')
+    document.getElementById('panel-' + market).classList.add('active')
+  }
+</script>
+
+</body>
+</html>

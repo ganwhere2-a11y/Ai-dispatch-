@@ -5,8 +5,8 @@
 | Tool | Agent(s) | Purpose | Data In | Data Out | Permission Tier | Status |
 |---|---|---|---|---|---|---|
 | **Retell AI** | Receptionist | 24/7 voice agent | Caller voice | Call transcript, lead data | Tier 1 | Required Day 1 |
-| **Telegram Bot API** | Daniel | Morning reports + urgent alerts | Agent events | Text messages + buttons | Tier 1 | Required Day 1 |
-| **Twilio** | Daniel (backup SMS), Receptionist (phone number) | SMS fallback + inbound calls | Events | SMS | Tier 1 | Required Day 1 |
+| **Telegram Bot API** | Maya | Morning reports + urgent alerts | Agent events | Text messages + buttons | Tier 1 | Required Day 1 |
+| **Twilio** | Maya (backup SMS), Receptionist (phone number) | SMS fallback + inbound calls | Events | SMS | Tier 1 | Required Day 1 |
 | **Anthropic Claude API** | All agents | AI reasoning and generation | Text prompts | Text responses | Tier 0 | Required Day 1 |
 | **Airtable** | All agents | CRM + all operational data | All records | Read/write records | Tier 0-1 | Required Day 1 |
 | **FMCSA SAFER API** | Compliance, Onboarding | Carrier vetting | MC#, DOT# | Safety rating, authority status, insurance | Tier 0 | Required Day 1 |
@@ -30,7 +30,7 @@ Claude (Orchestrator)
   → Telegram (Write — Tier 1)
   → DAT API (Read-only — Tier 0)
   → DocuSign (Write only with owner approval — Tier 3)
-  → Factoring API (Write with Daniel approval — Tier 2)
+  → Factoring API (Write with Maya approval — Tier 2)
 ```
 
 ## Data Flow
@@ -42,7 +42,7 @@ Load Request (email/call/form)
   → Erin pulls load board data (DAT)
   → Compliance vets carrier (FMCSA SAFER API)
   → Erin calculates rate + commission
-  → Daniel escalates if >$5K (Telegram)
+  → Maya escalates if >$5K (Telegram)
   → Owner approves (Telegram button)
   → Erin generates docs (templates → email)
   → Carrier confirms (email/call)

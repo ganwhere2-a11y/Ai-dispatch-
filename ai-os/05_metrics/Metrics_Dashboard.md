@@ -38,7 +38,7 @@ Every Friday, the weekly review workflow generates:
 
 ## Monthly Review
 
-First Monday of each month, Daniel delivers a longer report:
+First Monday of each month, Maya delivers a longer report:
 
 1. Month-over-month revenue growth %
 2. Truck count progress toward 200 goal

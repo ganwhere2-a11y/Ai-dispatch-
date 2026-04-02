@@ -129,7 +129,7 @@ export async function getConfidence(situationType, agentName, currentInputs) {
 }
 
 /**
- * Get a summary of all decisions for Daniel's morning report.
+ * Get a summary of all decisions for Maya's morning report.
  * Returns counts by agent, situation type, and autonomous eligibility.
  */
 export async function getSummary() {

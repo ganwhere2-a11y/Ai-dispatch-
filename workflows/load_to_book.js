@@ -2,7 +2,7 @@
  * Workflow: Load to Book
  *
  * Full load lifecycle from intake to invoice.
- * Orchestrates Erin, Compliance, and Daniel agents
+ * Orchestrates Erin, Compliance, and Maya agents
  * through every stage of booking a freight load.
  *
  * Stages:
@@ -21,7 +21,7 @@ import 'dotenv/config'
 import Anthropic from '@anthropic-ai/sdk'
 import { evaluateLoad, calculateClientRate } from '../agents/erin/erin.js'
 import { checkLoad, vetCarrier } from '../agents/compliance/compliance.js'
-import { evaluateEscalation } from '../agents/daniel/daniel.js'
+import { evaluateEscalation } from '../agents/maya/maya.js'
 import { logDecision } from '../decision_engine/engine.js'
 
 const client = new Anthropic()

@@ -20,7 +20,7 @@ import 'dotenv/config'
 import Anthropic from '@anthropic-ai/sdk'
 import Airtable from 'airtable'
 import { vetCarrier } from '../agents/compliance/compliance.js'
-import { evaluateEscalation } from '../agents/daniel/daniel.js'
+import { evaluateEscalation } from '../agents/maya/maya.js'
 import { logDecision } from '../decision_engine/engine.js'
 import { AgentMemory } from '../shared/memory.js'
 
@@ -324,7 +324,7 @@ export async function startTrial(carrier) {
     confidence_before: 0.95
   })
 
-  // Notify Daniel (Day 1 info for morning report)
+  // Notify Maya (Day 1 info for morning report)
   await evaluateEscalation({
     type: 'trial_started',
     agent: 'workflow/trial_onboarding',
@@ -457,7 +457,7 @@ Return JSON with:
     const conversionEmail = EMAIL_TEMPLATES.conversion_offer(record, stats)
     if (record.email) await sendEmail(record.email, conversionEmail)
 
-    // Escalate to Daniel for morning report
+    // Escalate to Maya for morning report
     await evaluateEscalation({
       type: 'trial_day7_conversion',
       agent: 'workflow/trial_onboarding',
@@ -468,7 +468,7 @@ Return JSON with:
     const nurtureEmail = EMAIL_TEMPLATES.nurture_day7(record)
     if (record.email) await sendEmail(record.email, nurtureEmail)
 
-    // Notify Daniel that this trial didn't convert
+    // Notify Maya that this trial didn't convert
     await evaluateEscalation({
       type: 'trial_not_converted',
       agent: 'workflow/trial_onboarding',

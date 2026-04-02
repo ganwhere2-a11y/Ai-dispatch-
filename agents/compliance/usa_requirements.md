@@ -57,7 +57,7 @@ A valid BOL must include:
 
 ## What Triggers a Hold
 
-Any of these puts the load on hold immediately (Compliance blocks it, Daniel alerts owner):
+Any of these puts the load on hold immediately (Compliance blocks it, Maya alerts owner):
 1. Carrier safety rating is Conditional or Unsatisfactory
 2. Carrier insurance expired or about to expire (<30 days)
 3. Carrier has active out-of-service order

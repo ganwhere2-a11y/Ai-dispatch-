@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "daniel": "node agents/daniel/daniel.js",
+    "maya": "node agents/maya/maya.js",
     "erin": "node agents/erin/erin.js",
     "receptionist": "node agents/receptionist/webhook_handler.js",
     "sales": "node agents/sales/sales.js",
@@ -20,7 +20,7 @@
     "test:iron-rules": "node agents/erin/erin.js --test-iron-rules",
     "test:pricing": "node agents/erin/erin.js --test-pricing",
     "test:decision-engine": "node decision_engine/engine.js --test",
-    "test:daniel-sms": "node agents/daniel/daniel.js --test-sms"
+    "test:maya-sms": "node agents/maya/maya.js --test-sms"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
