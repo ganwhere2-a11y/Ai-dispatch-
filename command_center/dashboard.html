@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Dispatch — Command Center</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c10;--surface:#111318;--card:#161a22;--border:#1e2330;
+  --accent:#2563eb;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--purple:#7c3aed;
+  --text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;z-index:10}
+.brand{padding:20px 16px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+.brand-logo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.brand-icon{width:30px;height:30px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.brand-name{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.brand-name span{color:var(--accent)}
+.brand-sub{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;padding-left:40px}
+
+.sb-search{padding:10px 12px;border-bottom:1px solid var(--border)}
+.sb-search input{width:100%;background:#0d1017;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:11px;color:var(--text);outline:none}
+.sb-search input::placeholder{color:var(--muted)}
+.sb-search input:focus{border-color:var(--accent)}
+
+.sb-nav{padding:8px 0}
+.sb-nav-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;transition:background .15s;border-left:3px solid transparent;font-size:12px;color:var(--muted2)}
+.sb-nav-item:hover{background:var(--card);color:var(--text)}
+.sb-nav-item.active{background:rgba(37,99,235,.1);border-left-color:var(--accent);color:#fff}
+.sb-nav-icon{font-size:14px;width:18px;text-align:center}
+
+.dept-group{margin:4px 0}
+.dept-header{display:flex;align-items:center;justify-content:space-between;padding:6px 14px 4px;cursor:pointer;user-select:none}
+.dept-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:600}
+.dept-meta{display:flex;align-items:center;gap:6px}
+.dept-count{font-size:9px;color:var(--muted);background:var(--card);padding:1px 6px;border-radius:8px;border:1px solid var(--border)}
+.dept-arrow{font-size:10px;color:var(--muted);transition:transform .2s}
+.dept-arrow.collapsed{transform:rotate(-90deg)}
+.dept-agents{overflow:hidden;transition:max-height .25s ease}
+
+.agent-row{display:flex;align-items:center;gap:9px;padding:7px 14px 7px 18px;cursor:pointer;transition:background .15s;border-left:3px solid transparent;position:relative}
+.agent-row:hover{background:var(--card)}
+.agent-row.active{border-left-color:var(--accent);background:rgba(37,99,235,.08)}
+.agent-icon{font-size:16px;width:22px;text-align:center}
+.agent-info{flex:1;min-width:0}
+.agent-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agent-role-small{font-size:9px;color:var(--muted)}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--green);box-shadow:0 0 5px rgba(34,197,94,.5)}
+.dot-purple{background:#a78bfa;box-shadow:0 0 5px rgba(167,139,250,.5)}
+.dot-yellow{background:var(--yellow)}
+.dot-red{background:var(--red)}
+
+.sb-section-divider{height:1px;background:var(--border);margin:8px 14px}
+
+.sb-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--border);flex-shrink:0}
+.sb-footer-time{font-size:10px;color:var(--muted);margin-bottom:6px}
+.sb-kill-row{display:flex;align-items:center;justify-content:space-between}
+.sb-kill-label{font-size:10px;color:var(--muted)}
+.kill-badge{font-size:9px;padding:2px 8px;border-radius:8px;font-weight:700}
+.kill-off{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.kill-on{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── DASHBOARD VIEW ── */
+#dashboard-view{flex:1;overflow-y:auto;padding:22px 24px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.topbar-left h2{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.4px}
+.topbar-left .sub{font-size:11px;color:var(--muted);margin-top:3px}
+.status-pill{display:flex;align-items:center;gap:6px;border-radius:20px;padding:6px 14px;font-size:11px;font-weight:500}
+.status-on{background:rgba(22,163,74,.1);border:1px solid rgba(34,197,94,.25);color:var(--green)}
+.status-paused{background:rgba(220,38,38,.1);border:1px solid rgba(239,68,68,.25);color:var(--red)}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0)}}
+
+.mktabs{display:flex;gap:6px;margin-bottom:16px}
+.mktab{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;cursor:pointer;transition:all .15s}
+.mktab:hover{color:var(--text)}
+.mktab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.metric-label{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px}
+.metric-value{font-size:30px;font-weight:700;color:#fff;letter-spacing:-1.5px;line-height:1}
+.metric-trend{font-size:10px;margin-top:5px}
+.trend-up{color:var(--green)}.trend-down{color:var(--red)}.trend-neutral{color:var(--muted)}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.three-col{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.dash-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.dash-card-title{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;font-weight:600}
+
+.priority-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.priority-item:last-child{border-bottom:none}
+.p-num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.p-txt{font-size:11px;line-height:1.5;color:var(--text)}
+
+.dec-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px}
+.dec-item:last-child{margin-bottom:0}
+.dec-header{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.tier-tag{font-size:8px;padding:2px 7px;border-radius:6px;background:rgba(245,158,11,.12);color:#fbbf24;font-weight:700;border:1px solid rgba(245,158,11,.2)}
+.dec-agent-name{font-size:10px;color:var(--muted)}
+.dec-text{font-size:11px;line-height:1.5;color:var(--text);margin-bottom:9px}
+.dec-actions{display:flex;gap:7px}
+.btn-approve{padding:5px 14px;border-radius:6px;border:none;background:#16a34a;color:#fff;font-size:10px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-approve:hover{background:#15803d}
+.btn-reject{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:10px;cursor:pointer;transition:all .15s}
+.btn-reject:hover{border-color:#ef4444;color:#ef4444}
+.no-decisions{color:var(--green);font-size:11px;text-align:center;padding:12px 0}
+
+.iron-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.iron-stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+.iron-num{font-size:24px;font-weight:700;line-height:1}
+.iron-num-bad{color:var(--red)}.iron-num-good{color:var(--green)}
+.iron-lbl{font-size:9px;color:var(--muted);margin-top:3px}
+
+.shadow-phase-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.phase-badge{font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.3);font-weight:700}
+.shadow-stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px}
+.shadow-stat:last-child{border-bottom:none}
+.skey{color:var(--muted)}.sval{color:#fff;font-weight:600}
+
+.agent-table-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px}
+.agent-table-row:last-child{border-bottom:none}
+.agent-table-left{display:flex;align-items:center;gap:8px}
+.agent-table-icon{font-size:14px}
+.agent-table-name{font-weight:500}
+.agent-table-role{font-size:9px;color:var(--muted);margin-top:1px}
+.agent-table-msg{font-size:10px;color:var(--muted);text-align:right;max-width:280px}
+
+.dash-footer{font-size:10px;color:var(--muted);text-align:center;padding:12px 0 4px;border-top:1px solid var(--border);margin-top:4px}
+
+/* ── AGENT PROFILE VIEW ── */
+#agent-view{flex:1;display:none;flex-direction:column;overflow:hidden}
+.agent-view-inner{flex:1;overflow-y:auto;padding:22px 28px 0}
+.agent-back{display:inline-flex;align-items:center;gap:7px;font-size:11px;color:var(--muted);cursor:pointer;margin-bottom:20px;padding:5px 0}
+.agent-back:hover{color:var(--text)}
+.agent-hero{display:flex;align-items:center;gap:18px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.agent-hero-icon{font-size:52px;width:72px;height:72px;background:var(--card);border-radius:16px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border)}
+.agent-hero-info{flex:1}
+.agent-hero-name{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.5px}
+.agent-hero-role-badge{display:inline-block;margin-top:6px;font-size:10px;padding:3px 10px;border-radius:20px;font-weight:600}
+.agent-hero-status{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:var(--muted)}
+
+.agent-section-title{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;margin-bottom:10px}
+.agent-desc{font-size:13px;line-height:1.65;color:var(--muted2);margin-bottom:22px}
+
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.qa-btn{padding:13px 16px;border-radius:10px;border:1px solid var(--border);background:var(--card);cursor:pointer;text-align:left;transition:all .2s;font-size:12px;font-weight:500;color:var(--text)}
+.qa-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+
+.skills-toggle{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;cursor:pointer;margin-bottom:8px}
+.skills-toggle-label{font-size:12px;font-weight:500}
+.skills-toggle-arrow{font-size:12px;color:var(--muted);transition:transform .2s}
+.skills-toggle-arrow.open{transform:rotate(180deg)}
+.skills-body{background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:12px 14px;display:none}
+.skill-tag{display:inline-block;font-size:10px;padding:3px 8px;border-radius:6px;background:var(--surface);border:1px solid var(--border);color:var(--muted2);margin:3px 3px 3px 0}
+
+/* ── MESSAGE BAR ── */
+.msg-bar{padding:14px 20px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.msg-bar input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text);outline:none;transition:border-color .15s}
+.msg-bar input:focus{border-color:var(--accent)}
+.msg-bar input::placeholder{color:var(--muted)}
+.msg-send{padding:10px 18px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;flex-shrink:0}
+.msg-send:hover{background:#1d4ed8}
+
+/* ── MOBILE ── */
+.hamburger{display:none;position:fixed;top:14px;left:14px;z-index:100;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:16px}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8}
+
+@media(max-width:768px){
+  body{overflow:auto}
+  .sidebar{position:fixed;left:-240px;top:0;height:100vh;transition:left .25s;z-index:9}
+  .sidebar.open{left:0}
+  .hamburger{display:flex}
+  .sb-overlay.show{display:block}
+  .main{width:100%}
+  #dashboard-view{padding:56px 14px 14px}
+  .metrics-grid{grid-template-columns:1fr 1fr}
+  .two-col,.three-col{grid-template-columns:1fr}
+  .iron-grid{grid-template-columns:repeat(2,1fr)}
+  .agent-view-inner{padding:60px 14px 0}
+}
+</style>
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sb-overlay" id="sb-overlay" onclick="toggleSidebar()"></div>
+
+<!-- ── SIDEBAR ── -->
+<div class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-logo">
+      <div class="brand-icon">🚛</div>
+      <div class="brand-name">AI<span>Dispatch</span></div>
+    </div>
+    <div class="brand-sub">Command Center</div>
+  </div>
+
+  <div class="sb-search">
+    <input type="text" id="agent-search" placeholder="Search agents..." oninput="filterAgents(this.value)">
+  </div>
+
+  <div class="sb-nav">
+    <div class="sb-nav-item active" id="nav-dashboard" onclick="showDashboard()">
+      <span class="sb-nav-icon">⚡</span>
+      <span>Dashboard</span>
+    </div>
+  </div>
+
+  <div class="sb-section-divider"></div>
+
+  <!-- EXECUTIVE -->
+  <div class="dept-group" id="dept-Executive">
+    <div class="dept-header" onclick="toggleDept('Executive')">
+      <span class="dept-label">Executive</span>
+      <div class="dept-meta">
+        <span class="dept-count">1</span>
+        <span class="dept-arrow" id="arrow-Executive">▾</span>
+      </div>
+    </div>
+    <div class="dept-agents" id="agents-Executive"></div>
+  </div>
+
+  <!-- DISPATCH -->
+  <div class="dept-group" id="dept-Dispatch">
+    <div class="dept-header" onclick="toggleDept('Dispatch')">
+      <span class="dept-label">Dispatch</span>
+      <div class="dept-meta">
+        <span class="dept-count">2</span>
+        <span class="dept-arrow" id="arrow-Dispatch">▾</span>
+      </div>
+    </div>
+    <div class="dept-agents" id="agents-Dispatch"></div>
+  </div>
+
+  <!-- GROWTH -->
+  <div class="dept-group" id="dept-Growth">
+    <div class="dept-header" onclick="toggleDept('Growth')">
+      <span class="dept-label">Growth</span>
+      <div class="dept-meta">
+        <span class="dept-count">3</span>
+        <span class="dept-arrow" id="arrow-Growth">▾</span>
+      </div>
+    </div>
+    <div class="dept-agents" id="agents-Growth"></div>
+  </div>
+
+  <!-- OPERATIONS -->
+  <div class="dept-group" id="dept-Operations">
+    <div class="dept-header" onclick="toggleDept('Operations')">
+      <span class="dept-label">Operations</span>
+      <div class="dept-meta">
+        <span class="dept-count">3</span>
+        <span class="dept-arrow" id="arrow-Operations">▾</span>
+      </div>
+    </div>
+    <div class="dept-agents" id="agents-Operations"></div>
+  </div>
+
+  <div class="sb-section-divider"></div>
+
+  <div class="sb-nav">
+    <div class="sb-nav-item" style="opacity:.5;cursor:default">
+      <span class="sb-nav-icon">⚙️</span>
+      <span>Settings</span>
+    </div>
+  </div>
+
+  <div class="sb-footer">
+    <div class="sb-footer-time" id="sb-time">Loading...</div>
+    <div class="sb-kill-row">
+      <span class="sb-kill-label">Kill Switch</span>
+      <span class="kill-badge kill-off" id="kill-badge">OFF</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- DASHBOARD VIEW -->
+  <div id="dashboard-view">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2>Command Center</h2>
+        <div class="sub" id="topbar-sub">Loading...</div>
+      </div>
+      <div class="status-pill status-on" id="status-pill">
+        <div class="pulse" id="pulse-dot"></div>
+        <span id="status-text">Loading...</span>
+      </div>
+    </div>
+
+    <div class="mktabs">
+      <div class="mktab active" id="tab-usa">🇺🇸 USA</div>
+      <div class="mktab" id="tab-canada">🇨🇦 Canada</div>
+      <div class="mktab" id="tab-eu">🇪🇺 EU</div>
+      <div class="mktab" id="tab-uk">🇬🇧 UK</div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Active Loads</div>
+        <div class="metric-value" id="m-loads">—</div>
+        <div class="metric-trend trend-up" id="m-loads-sub"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Revenue This Week</div>
+        <div class="metric-value" id="m-rev">—</div>
+        <div class="metric-trend trend-up" id="m-rev-sub"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Trucks Under Mgmt</div>
+        <div class="metric-value" id="m-trucks">—</div>
+        <div class="metric-trend trend-neutral">Year goal: 200</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Trial Prospects</div>
+        <div class="metric-value" id="m-trials">—</div>
+        <div class="metric-trend trend-neutral" id="m-trials-sub"></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="dash-card">
+        <div class="dash-card-title">Today's Priority List</div>
+        <div id="priorities"></div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-title">Needs Your Decision</div>
+        <div id="decisions"></div>
+      </div>
+    </div>
+
+    <div class="three-col">
+      <div class="dash-card">
+        <div class="dash-card-title">Iron Rule Blocks — This Week</div>
+        <div class="iron-grid" id="iron-grid"></div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-title">CEO Shadow</div>
+        <div id="shadow-panel"></div>
+      </div>
+    </div>
+
+    <div class="dash-card" style="margin-bottom:12px">
+      <div class="dash-card-title">All Agents — Live Status</div>
+      <div id="agent-table"></div>
+    </div>
+
+    <div class="dash-footer" id="dash-footer">Generated by Maya · AI Dispatch OS</div>
+  </div>
+
+  <!-- AGENT PROFILE VIEW -->
+  <div id="agent-view">
+    <div class="agent-view-inner">
+      <div class="agent-back" onclick="showDashboard()">← Back to Dashboard</div>
+      <div class="agent-hero">
+        <div class="agent-hero-icon" id="av-icon">🧠</div>
+        <div class="agent-hero-info">
+          <div class="agent-hero-name" id="av-name">Maya</div>
+          <div class="agent-hero-role-badge" id="av-badge">Executive Assistant</div>
+          <div class="agent-hero-status">
+            <div class="status-dot dot-green" id="av-dot"></div>
+            <span id="av-status-text">Online · All systems operational</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-section-title">About</div>
+      <div class="agent-desc" id="av-desc">Loading...</div>
+
+      <div class="agent-section-title">Quick Actions</div>
+      <div class="quick-actions" id="av-actions"></div>
+
+      <div class="skills-toggle" onclick="toggleSkills()">
+        <span class="skills-toggle-label">Skills &amp; Expertise</span>
+        <span class="skills-toggle-arrow" id="skills-arrow">▾</span>
+      </div>
+      <div class="skills-body" id="skills-body"></div>
+
+      <div style="height:80px"></div>
+    </div>
+    <div class="msg-bar">
+      <input type="text" id="msg-input" placeholder="Message Maya..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="msg-send" onclick="sendMsg()">Send →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── AGENT DATA ──
+const AGENTS = [
+  {
+    name:'Maya', icon:'🧠', dept:'Executive', role:'Executive Assistant', color:'#2563eb',
+    desc:'Orchestrates all 9 agents. Sends your 6AM morning briefing, routes Tier 2+ escalations, and is your single point of control for everything happening in the business.',
+    actions:['Morning Report','Escalation Log','Decision Queue','System Status'],
+    skills:['Morning briefing generation','Tier 2/3 escalation routing','Telegram alerts','Agent coordination','Kill switch protocol','Decision tracking']
+  },
+  {
+    name:'Erin', icon:'🚛', dept:'Dispatch', role:'Dispatcher', color:'#16a34a',
+    desc:'Core freight engine. Books loads end-to-end, enforces all 8 Iron Rules on every load, runs the load-to-book pipeline, and manages the full carrier-to-delivery cycle.',
+    actions:['Load Pipeline','Iron Rule Check','Quote Calculator','Active Loads'],
+    skills:['Load booking','Iron Rule enforcement','RPM calculation','Deadhead optimization','Carrier matching','BOL generation']
+  },
+  {
+    name:'Compliance', icon:'🔍', dept:'Dispatch', role:'Gatekeeper', color:'#d97706',
+    desc:'Vets every carrier before their first load. Pulls FMCSA SAFER data, checks authority age, safety rating, cargo type, and insurance — no carrier moves freight without clearing Compliance first.',
+    actions:['Vet Carrier','FMCSA Lookup','Authority Check','Safety Report'],
+    skills:['FMCSA SAFER verification','Authority age validation','Safety rating check','Cargo type screening','Insurance verification','Carrier blacklist management']
+  },
+  {
+    name:'Sales', icon:'📊', dept:'Growth', role:'Lead Gen', color:'#7c3aed',
+    desc:'Scrapes FMCSA for qualified dry van carriers with 180+ day authority. Runs automated 4-email outreach sequences and keeps the lead pipeline filled.',
+    actions:['Scrape Leads','Start Outreach','Pipeline Status','Email Sequence'],
+    skills:['FMCSA API scraping','Lead qualification','4-email outreach sequences','Pipeline management','Follow-up automation','Conversion tracking']
+  },
+  {
+    name:'Onboarding', icon:'🎯', dept:'Growth', role:'Trial Funnel', color:'#0891b2',
+    desc:'Manages the 7-day free trial funnel. Sends carrier packets, runs daily check-ins on days 1/3/5/7, and handles conversion from trial to paid at $350/month.',
+    actions:['Start Trial','Trial Status','Convert to Paid','Send Packet'],
+    skills:['7-day trial automation','Carrier packet generation','Day 1/3/5/7 check-ins','Paid conversion workflow','Trial-to-paid tracking','Onboarding emails']
+  },
+  {
+    name:'Receptionist', icon:'📞', dept:'Growth', role:'Voice AI', color:'#059669',
+    desc:'24/7 inbound voice AI powered by Retell. Answers every call, routes leads to Sales, handles carrier FAQs, and captures contact info — without you ever picking up the phone.',
+    actions:['Call Log','Live Status','Routing Config','Transcripts'],
+    skills:['Retell AI voice handling','Call routing','Lead capture','FAQ automation','Transcript logging','After-hours coverage']
+  },
+  {
+    name:'Support', icon:'💬', dept:'Operations', role:'Retention', color:'#dc2626',
+    desc:'Handles carrier and client complaints, retention outreach, and relationship repair. Triages issues by severity and escalates anything that could cost you a carrier.',
+    actions:['Open Tickets','Carrier Pulse','Complaint Log','Retention Report'],
+    skills:['Complaint triage','Carrier retention outreach','Issue escalation','Relationship repair','Satisfaction tracking','Churn prevention']
+  },
+  {
+    name:'Marketer', icon:'📱', dept:'Operations', role:'Content', color:'#ea580c',
+    desc:'Builds your brand on TikTok and YouTube. Manages the content calendar, writes video scripts, and keeps a steady stream of freight content going out on schedule.',
+    actions:['Content Calendar','Script Generator','Post Schedule','Analytics'],
+    skills:['TikTok script writing','YouTube content strategy','Content calendar management','Freight industry positioning','Hook writing','Posting schedule automation']
+  },
+  {
+    name:'CEO Shadow', icon:'👁️', dept:'Operations', role:'Observer', color:'#7c3aed',
+    desc:'Silently observes every Tier 2+ decision you make. Learns your patterns, builds confidence scores, and progresses through 3 phases toward becoming your full proxy decision-maker.',
+    actions:['Decision Log','Pattern Report','Confidence Score','Phase Status'],
+    skills:['Decision pattern learning','Confidence scoring','Phase 1: Observe','Phase 2: Suggest','Phase 3: Proxy (85%+ confidence)','Owner decision modeling']
+  }
+]
+
+// ── STATE ──
+let currentAgent = null
+let liveData = null
+let collapsed = {}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  renderSidebar()
+  loadData()
+  setInterval(loadData, 5 * 60 * 1000)
+})
+
+// ── SIDEBAR RENDER ──
+function renderSidebar() {
+  const depts = ['Executive','Dispatch','Growth','Operations']
+  depts.forEach(dept => {
+    const container = document.getElementById('agents-' + dept)
+    const agents = AGENTS.filter(a => a.dept === dept)
+    container.innerHTML = agents.map(a => `
+      <div class="agent-row" id="row-${a.name}" onclick="showAgent('${a.name}')">
+        <span class="agent-icon">${a.icon}</span>
+        <div class="agent-info">
+          <div class="agent-name">${a.name}</div>
+          <div class="agent-role-small">${a.role}</div>
+        </div>
+        <div class="status-dot dot-green" id="dot-${a.name}"></div>
+      </div>
+    `).join('')
+    container.style.maxHeight = '500px'
+  })
+}
+
+function toggleDept(dept) {
+  const container = document.getElementById('agents-' + dept)
+  const arrow = document.getElementById('arrow-' + dept)
+  collapsed[dept] = !collapsed[dept]
+  container.style.maxHeight = collapsed[dept] ? '0' : '500px'
+  arrow.classList.toggle('collapsed', collapsed[dept])
+}
+
+function filterAgents(q) {
+  const lower = q.toLowerCase()
+  AGENTS.forEach(a => {
+    const row = document.getElementById('row-' + a.name)
+    if(row) row.style.display = (!q || a.name.toLowerCase().includes(lower) || a.role.toLowerCase().includes(lower)) ? '' : 'none'
+  })
+}
+
+// ── DATA LOAD ──
+async function loadData() {
+  try {
+    const r = await fetch('/api/data')
+    liveData = await r.json()
+    renderDashboard(liveData)
+    updateSidebarDots(liveData)
+    updateSidebarFooter(liveData)
+    if(currentAgent) updateAgentStatus(currentAgent, liveData)
+  } catch(e) {
+    console.error('Data load failed:', e)
+  }
+}
+
+// ── SIDEBAR FOOTER ──
+function updateSidebarFooter(d) {
+  const now = new Date()
+  document.getElementById('sb-time').textContent = 'Refreshed ' + now.toLocaleTimeString()
+  const kb = document.getElementById('kill-badge')
+  kb.textContent = d.paused ? 'ON' : 'OFF'
+  kb.className = 'kill-badge ' + (d.paused ? 'kill-on' : 'kill-off')
+}
+
+// ── SIDEBAR DOTS ──
+function updateSidebarDots(d) {
+  d.agents.forEach(a => {
+    const dot = document.getElementById('dot-' + a.name)
+    if(dot) {
+      dot.className = 'status-dot ' + (a.status === 'purple' ? 'dot-purple' : a.status === 'red' ? 'dot-red' : 'dot-green')
+    }
+  })
+}
+
+// ── DASHBOARD RENDER ──
+function renderDashboard(d) {
+  const now = new Date()
+  document.getElementById('topbar-sub').textContent =
+    now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) + ' · ' + d.market + ' Market Active'
+
+  const pill = document.getElementById('status-pill')
+  const txt = document.getElementById('status-text')
+  if(d.paused) {
+    pill.className = 'status-pill status-paused'
+    txt.textContent = 'System Paused'
+  } else {
+    pill.className = 'status-pill status-on'
+    txt.textContent = 'All Systems Operational'
+  }
+
+  document.getElementById('m-loads').textContent = d.metrics.activeLoads
+  document.getElementById('m-loads-sub').textContent = d.decisions.thisWeek + ' decisions this week'
+  document.getElementById('m-rev').textContent = '$' + d.metrics.revenueWeek.toLocaleString()
+  const rc = d.metrics.revenueChange
+  document.getElementById('m-rev-sub').textContent = (rc >= 0 ? '↑ $' : '↓ $') + Math.abs(rc).toLocaleString() + ' vs last week'
+  document.getElementById('m-trucks').textContent = d.metrics.truckCount
+  document.getElementById('m-trials').textContent = d.metrics.trialCount
+  document.getElementById('m-trials-sub').textContent = d.metrics.trialCount + ' active trials'
+
+  document.getElementById('priorities').innerHTML = d.priorities.map((p,i) =>
+    `<div class="priority-item"><div class="p-num">${i+1}</div><div class="p-txt">${p}</div></div>`
+  ).join('')
+
+  document.getElementById('decisions').innerHTML = d.decisions_needed.length > 0
+    ? d.decisions_needed.map(dec =>
+        `<div class="dec-item">
+          <div class="dec-header"><span class="tier-tag">TIER 2</span><span class="dec-agent-name">${dec.agent}</span></div>
+          <div class="dec-text">${dec.text}</div>
+          <div class="dec-actions">
+            <button class="btn-approve" onclick="handleDecision(this,'approve')">Approve</button>
+            <button class="btn-reject" onclick="handleDecision(this,'reject')">Reject</button>
+          </div>
+        </div>`
+      ).join('')
+    : '<div class="no-decisions">✓ No decisions needed right now</div>'
+
+  const ir = d.ironRules
+  document.getElementById('iron-grid').innerHTML = [
+    [ir.fl,'No Florida'],[ir.rpm,'Low RPM'],[ir.deadhead,'Deadhead'],[ir.weight,'Over Weight']
+  ].map(([n,l]) =>
+    `<div class="iron-stat">
+      <div class="iron-num ${n===0?'iron-num-good':'iron-num-bad'}">${n}</div>
+      <div class="iron-lbl">${l}</div>
+    </div>`
+  ).join('')
+
+  const sh = d.shadow
+  document.getElementById('shadow-panel').innerHTML =
+    `<div class="shadow-phase-row">
+      <span class="phase-badge">Phase ${sh.phase}</span>
+      <span style="font-size:10px;color:var(--muted)">${sh.phase===1?'Observe & Learn':sh.phase===2?'Suggest':'Proxy Mode'}</span>
+    </div>
+    <div class="shadow-stat"><span class="skey">Decisions logged</span><span class="sval">${sh.decisions}</span></div>
+    <div class="shadow-stat"><span class="skey">Patterns found</span><span class="sval">${sh.patterns}</span></div>
+    <div class="shadow-stat"><span class="skey">Confidence score</span><span class="sval" style="color:${sh.confidence>=85?'var(--green)':sh.confidence>=50?'var(--yellow)':'var(--red)'}">${sh.confidence}%</span></div>
+    <div class="shadow-stat"><span class="skey">To Phase ${sh.phase<3?sh.phase+1:3}</span><span class="sval">${sh.phase>=3?'✓ Max':'${Math.max(0,85-sh.confidence)}% to go'}</span></div>`
+
+  document.getElementById('shadow-panel').innerHTML =
+    `<div class="shadow-phase-row">
+      <span class="phase-badge">Phase ${sh.phase}</span>
+      <span style="font-size:10px;color:var(--muted)">${sh.phase===1?'Observe & Learn':sh.phase===2?'Suggest':'Proxy Mode'}</span>
+    </div>
+    <div class="shadow-stat"><span class="skey">Decisions logged</span><span class="sval">${sh.decisions}</span></div>
+    <div class="shadow-stat"><span class="skey">Patterns found</span><span class="sval">${sh.patterns}</span></div>
+    <div class="shadow-stat"><span class="skey">Confidence</span><span class="sval">${sh.confidence}%</span></div>`
+
+  document.getElementById('agent-table').innerHTML = d.agents.map(a => {
+    const meta = AGENTS.find(x => x.name === a.name) || {}
+    return `<div class="agent-table-row">
+      <div class="agent-table-left">
+        <span class="agent-table-icon">${meta.icon||'🤖'}</span>
+        <div>
+          <div class="agent-table-name">${a.name}</div>
+          <div class="agent-table-role">${a.role}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="agent-table-msg">${a.msg}</div>
+        <div class="status-dot ${a.status==='purple'?'dot-purple':a.status==='red'?'dot-red':'dot-green'}"></div>
+      </div>
+    </div>`
+  }).join('')
+
+  document.getElementById('dash-footer').textContent =
+    'Generated by Maya · AI Dispatch OS · ' + now.toLocaleTimeString() + ' · ' + d.market + ' Market'
+}
+
+// ── DECISION HANDLER ──
+function handleDecision(btn, action) {
+  const card = btn.closest('.dec-item')
+  card.style.opacity = '0.5'
+  card.innerHTML = `<div style="font-size:11px;color:var(--${action==='approve'?'green':'muted'});padding:8px 0">${action==='approve'?'✓ Approved — forwarded to agent':'✗ Rejected — logged for review'}</div>`
+}
+
+// ── VIEW SWITCHING ──
+function showDashboard() {
+  document.getElementById('dashboard-view').style.display = 'block'
+  document.getElementById('agent-view').style.display = 'none'
+  document.getElementById('agent-view').style.flexDirection = ''
+  document.getElementById('nav-dashboard').classList.add('active')
+  document.querySelectorAll('.agent-row').forEach(r => r.classList.remove('active'))
+  currentAgent = null
+  if(window.innerWidth <= 768) closeSidebar()
+}
+
+function showAgent(name) {
+  const a = AGENTS.find(x => x.name === name)
+  if(!a) return
+  currentAgent = name
+
+  document.getElementById('dashboard-view').style.display = 'none'
+  const av = document.getElementById('agent-view')
+  av.style.display = 'flex'
+  av.style.flexDirection = 'column'
+
+  document.getElementById('nav-dashboard').classList.remove('active')
+  document.querySelectorAll('.agent-row').forEach(r => r.classList.remove('active'))
+  const row = document.getElementById('row-' + name)
+  if(row) row.classList.add('active')
+
+  document.getElementById('av-icon').textContent = a.icon
+  document.getElementById('av-name').textContent = a.name
+  document.getElementById('av-desc').textContent = a.desc
+  document.getElementById('msg-input').placeholder = 'Message ' + a.name + '...'
+
+  const badge = document.getElementById('av-badge')
+  badge.textContent = a.role
+  badge.style.background = a.color + '22'
+  badge.style.color = a.color
+  badge.style.border = '1px solid ' + a.color + '44'
+
+  updateAgentStatus(name, liveData)
+
+  document.getElementById('av-actions').innerHTML = a.actions.map(act =>
+    `<button class="qa-btn" style="border-color:${a.color}33" onmouseover="this.style.background='${a.color}15';this.style.borderColor='${a.color}'" onmouseout="this.style.background='';this.style.borderColor='${a.color}33'">${act}</button>`
+  ).join('')
+
+  document.getElementById('skills-body').innerHTML = a.skills.map(s =>
+    `<span class="skill-tag">${s}</span>`
+  ).join('')
+  document.getElementById('skills-body').style.display = 'none'
+  document.getElementById('skills-arrow').classList.remove('open')
+
+  if(window.innerWidth <= 768) closeSidebar()
+}
+
+function updateAgentStatus(name, d) {
+  if(!d) return
+  const liveAgent = d.agents.find(a => a.name === name)
+  if(!liveAgent) return
+  const dot = document.getElementById('av-dot')
+  const txt = document.getElementById('av-status-text')
+  dot.className = 'status-dot ' + (liveAgent.status==='purple'?'dot-purple':liveAgent.status==='red'?'dot-red':'dot-green')
+  txt.textContent = liveAgent.msg || 'Online'
+}
+
+function toggleSkills() {
+  const body = document.getElementById('skills-body')
+  const arrow = document.getElementById('skills-arrow')
+  const open = body.style.display !== 'none'
+  body.style.display = open ? 'none' : 'block'
+  arrow.classList.toggle('open', !open)
+}
+
+function sendMsg() {
+  const input = document.getElementById('msg-input')
+  if(!input.value.trim()) return
+  input.value = ''
+  input.placeholder = 'Message sent ✓ — agent will respond in morning report'
+  setTimeout(() => {
+    if(currentAgent) input.placeholder = 'Message ' + currentAgent + '...'
+  }, 3000)
+}
+
+// ── MOBILE ──
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar')
+  const ov = document.getElementById('sb-overlay')
+  sb.classList.toggle('open')
+  ov.classList.toggle('show')
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open')
+  document.getElementById('sb-overlay').classList.remove('show')
+}
+</script>
+</body>
+</html>
