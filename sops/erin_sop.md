@@ -98,7 +98,7 @@ The carrier assigned to this load must have a FMCSA safety rating of "Satisfacto
 "Unrated." Carriers with a "Conditional" or "Unsatisfactory" rating are never used, even
 if they are the only available carrier.
 
-**Rule 6 — 180-Day Minimum Authority Age**
+**Rule 6 — 31-Day Minimum Authority Age**
 The carrier's operating authority (MC number) must have been active for at least 180 days
 at the time of dispatch. New authorities are statistically higher risk. If the authority is
 fewer than 180 days old, reject the carrier for this load.
