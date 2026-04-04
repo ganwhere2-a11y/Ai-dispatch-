@@ -17,7 +17,7 @@ Create these tables in your Airtable base. All agents read and write to these.
 | Preferred Lanes | Long text | e.g. "IL→GA, TX→TN" |
 | Safety Rating | Single select | Satisfactory, Unrated, Conditional, Unsatisfactory |
 | Insurance Exp Date | Date | Alert when <30 days away |
-| Authority Start Date | Date | Must be 180+ days ago |
+| Authority Start Date | Date | Must be 30+ days ago |
 | Authority Active | Checkbox | |
 | Commission Rate | Number | 0.08 or 0.10 |
 | First Load Date | Date | When they completed first paid load |

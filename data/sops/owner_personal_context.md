@@ -39,7 +39,7 @@ I think like an operator, not an employee. I want systems, not tasks. I want out
 ## What I Refuse to Compromise On
 
 1. **The Iron Rules** — they never get bent. Not for a big load, not for a good carrier. Never.
-2. **Carrier quality** — Satisfactory or Unrated only. Authority age 180+ days. No exceptions.
+2. **Carrier quality** — Satisfactory or Unrated only. Authority age 30+ days. No exceptions.
 3. **My time** — I should not be in the weeds. If I'm doing something an agent could do, that's a system failure.
 4. **No Florida** — non-negotiable. Auto-reject, no discussion.
 5. **Simplicity** — every feature must be usable by 1 person. No complexity I can't maintain alone.

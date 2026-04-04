@@ -16,7 +16,7 @@ The owner does not dispatch manually. The agents do it. The owner only makes Tie
 ## Who We Serve
 
 **Primary ICP:** Dry Van carriers, 1–5 trucks, USA-based  
-- MC authority active 180+ days  
+- MC authority active 30+ days  
 - Satisfactory or Unrated safety rating  
 - Running dry van (no reefer, hazmat, flatbed, oversized)  
 - Looking for consistent loads without managing a broker relationship themselves  
@@ -51,7 +51,7 @@ The owner does not dispatch manually. The agents do it. The owner only makes Tie
 
 ## How We Acquire Carriers
 
-1. **FMCSA scraping** — Sales agent scrapes FMCSA database for qualifying carriers (dry van, 180+ days authority, satisfactory rating)
+1. **FMCSA scraping** — Sales agent scrapes FMCSA database for qualifying carriers (dry van, 30+ days authority, satisfactory rating)
 2. **Outreach sequence** — 4-email sequence over 10 days, personalized per carrier profile
 3. **Inbound calls** — Receptionist handles 24/7 via Retell AI, routes qualified leads to Onboarding
 4. **Ads (future)** — SDR agents targeting 500–1,000 carrier prospects via paid ads
@@ -84,7 +84,7 @@ The owner does not dispatch manually. The agents do it. The owner only makes Tie
 3. Max deadhead: max(50 miles, 25% of loaded miles) — stricter rule wins
 4. Max weight: 48,000 lbs cargo maximum
 5. Safety rating: Satisfactory or Unrated only
-6. Authority age: MC active 180+ days minimum
+6. Authority age: MC active 30+ days minimum
 7. Cargo type: dry van only
 8. Shipper RPM floor: direct contracts also meet $2.51/mile minimum
 

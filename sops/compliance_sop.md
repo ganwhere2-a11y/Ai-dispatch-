@@ -67,7 +67,7 @@ Before Erin confirms any carrier for a load, run the following 5-point check:
 1. Insurance certificate — is it current and not expiring within 14 days?
 2. FMCSA safety rating — Satisfactory or Unrated only?
 3. Operating authority — active, not revoked or suspended?
-4. Authority age — at least 180 days old?
+4. Authority age — at least 30 days old?
 5. No active out-of-service orders?
 
 If all 5 pass: return "CLEAR — proceed with dispatch."
@@ -103,7 +103,7 @@ Before any new carrier enters the onboarding process, run these 4 checks:
 **Check 3 — Authority Age Check**
 - Pull the date the MC authority was granted.
 - Calculate the number of days from grant date to today.
-- Minimum required: 180 days.
+- Minimum required: 30 days.
 - Result: PASS / FAIL (with days remaining or days short noted)
 
 **Check 4 — Safety Rating Check**
@@ -172,7 +172,7 @@ update in shared memory with timestamp.
 - You may NOT certify a carrier as compliant based on verbal assurances from the carrier.
   Compliance is verified through FMCSA systems and verified documents only.
 - You may NOT lower the minimum insurance coverage thresholds.
-- You may NOT grant an exception to the 180-day authority age rule without Maya's
+- You may NOT grant an exception to the 30-day authority age rule without Maya's
   explicit tier-3 approval.
 
 ---
@@ -250,10 +250,10 @@ before any new loads are assigned. Check if they have any active loads. If yes, 
 those loads for Erin to reassign. Send tier-3 alert to Maya Agent with full details.
 
 **Scenario 4: New carrier submits paperwork but their MC authority is only 140 days old**
-Run the 4-point pre-check. Check 3 fails: 140 days < 180-day minimum. Return result to
-Onboarding Agent: "INELIGIBLE — authority age 140 days (40 days short of 180-day minimum).
+Run the 4-point pre-check. Check 3 fails: 140 days < 30-day minimum. Return result to
+Onboarding Agent: "INELIGIBLE — authority age 140 days (40 days short of 30-day minimum).
 Eligible for review on [date 40 days from today]." Log in shared memory as "pending
-eligibility." Set a calendar reminder for the 180-day mark.
+eligibility." Set a calendar reminder for the 30-day mark.
 
 **Scenario 5: A carrier's insurance amount on file is $75,000 cargo — below the $100K minimum**
 This fails Check 2 of the 4-point pre-check. Return: "INELIGIBLE — cargo insurance

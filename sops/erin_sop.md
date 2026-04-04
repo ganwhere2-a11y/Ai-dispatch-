@@ -99,9 +99,9 @@ The carrier assigned to this load must have a FMCSA safety rating of "Satisfacto
 if they are the only available carrier.
 
 **Rule 6 — 31-Day Minimum Authority Age**
-The carrier's operating authority (MC number) must have been active for at least 180 days
+The carrier's operating authority (MC number) must have been active for at least 30 days
 at the time of dispatch. New authorities are statistically higher risk. If the authority is
-fewer than 180 days old, reject the carrier for this load.
+fewer than 30 days old, reject the carrier for this load.
 
 **Rule 7 — Dry Van Only**
 Ai-Dispatch operates exclusively in the dry van segment. No flatbed, no reefer, no
@@ -269,9 +269,9 @@ Run Iron Rule 3: Deadhead = 62 miles. Hard cap is 50 miles. Reject this carrier 
 Check for next nearest carrier within 50 miles. Do not bend the deadhead rule even if
 this is the only available carrier. Log as "no carrier match within 50mi deadhead."
 
-**Scenario 4: Carrier's MC authority was issued 155 days ago**
-Run Iron Rule 6: 155 days < 180-day minimum. Reject this carrier for this load. Check
-the approved carrier pool for alternatives. Log the rejection with the authority age.
+**Scenario 4: Carrier's MC authority was issued 20 days ago**
+Run Iron Rule 6: 20 days < 30-day minimum. Reject this carrier for this load. Check
+the approved carrier pool for alternatives. Log the rejection with the authority age. Flag for re-check at 30-day mark.
 
 **Scenario 5: Profitable dry van load destined for Miami, FL**
 Run Iron Rule 1 immediately. Florida destination — auto-reject. Do not calculate profit.
@@ -297,8 +297,8 @@ This is a tier-2 event. Do not renegotiate. Log the carrier's request. Escalate 
 Agent with full load details and carrier history. Hold the carrier's future load assignments
 pending Maya's guidance on how to handle the relationship.
 
-**Scenario 10: New carrier (45 days old authority) wants to haul a 500-mile run at $3.10/mi**
-Excellent rate, but Iron Rule 6 applies: 45 days < 180-day minimum. Reject. Also check
+**Scenario 10: New carrier (15 days old authority) wants to haul a 500-mile run at $3.10/mi**
+Excellent rate, but Iron Rule 6 applies: 15 days < 30-day minimum. Reject. Also check
 Rule 5 (safety rating) — new authorities are often "Unrated," which is allowed, but
 Conditional or Unsatisfactory is not. Log the rejection. Flag the carrier as a "watch
-for 180-day eligibility" in shared memory — revisit in 135 days.
+for 30-day eligibility" in shared memory — revisit in 15 days.

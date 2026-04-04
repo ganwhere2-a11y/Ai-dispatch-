@@ -191,7 +191,7 @@ MIN_RPM_PRIORITY             — Default $3.00
 MAX_DEADHEAD_MILES           — Default 50
 MAX_DEADHEAD_PCT             — Default 0.25 (25% of loaded miles)
 MAX_LOAD_WEIGHT              — Default 48000
-AUTHORITY_MIN_AGE_DAYS       — Default 180
+AUTHORITY_MIN_AGE_DAYS       — Default 30
 QUOTE_ESCALATION_THRESHOLD   — Default $5000
 COMMISSION_RATE_EXISTING     — Default 0.08
 COMMISSION_RATE_NEW          — Default 0.10
@@ -292,7 +292,7 @@ Erin enforces these in `agents/erin/erin.js`. Compliance validates them in `agen
 3. **Max Deadhead** — Max(50 miles, 25% of loaded miles), stricter rule wins → auto-reject if exceeded
 4. **Max Weight** — 48,000 lbs cargo maximum → auto-reject if over
 5. **Safety Rating** — Satisfactory or Unrated ONLY → auto-block Conditional/Unsatisfactory
-6. **Authority Age** — MC authority active 180+ days minimum → auto-block if under
+6. **Authority Age** — MC authority active 30+ days minimum → auto-block if under
 7. **Cargo Type** — Dry van only → auto-reject reefer, hazmat, oversized, flatbed
 8. **Shipper RPM Floor** — Direct contracts also meet $2.51/mile minimum
 

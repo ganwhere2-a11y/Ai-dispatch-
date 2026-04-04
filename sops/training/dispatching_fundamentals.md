@@ -428,7 +428,7 @@ COMMISSION_RATE_EXISTING = 0.08 (8% — established carriers)
 | Minimum $2.75/RPM | Below $2.51 = reject; $2.51–$2.74 = counter; $2.75+ = accept |
 | Max deadhead | 50 miles or 25% of loaded miles, whichever is stricter |
 | Max weight | 48,000 lbs cargo |
-| Authority age | MC must be active 180+ days |
+| Authority age | MC must be active 30+ days |
 | Safety rating | Satisfactory or Unrated only |
 | Rate conf first | Truck never moves without signed rate confirmation |
 | HOS compliance | Never assign load that requires HOS violation |
