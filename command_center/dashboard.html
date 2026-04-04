@@ -913,7 +913,7 @@ End every response with a clear next action.`
     chatHistory.push({role:'assistant',content:reply})
   } catch(e) {
     typing.remove()
-    appendMsg('bot', '⚠️ Connection error. Check your API key in Railway Variables.', currentAgent.icon)
+    appendMsg('bot', `⚠️ Connection error: ${e.message}. Check Railway Deploy Logs for details.`, currentAgent.icon)
   }
   isLoading = false
 }

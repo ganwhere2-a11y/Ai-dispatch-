@@ -249,9 +249,12 @@ app.post('/api/chat', async (req, res) => {
       body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1024, system: fullSystem, messages })
     })
     const data = await r.json()
+    if (!r.ok) {
+      return res.json({ content: [{ text: `⚠️ Anthropic API error ${r.status}: ${data.error?.message || JSON.stringify(data)}` }] })
+    }
     res.json(data)
   } catch (e) {
-    res.status(500).json({ error: e.message })
+    res.status(500).json({ content: [{ text: `⚠️ Server error: ${e.message}` }] })
   }
 })
 
