@@ -2,24 +2,31 @@
  * Workflow: Trial Onboarding
  *
  * Manages the full 7-day free trial lifecycle for new carriers.
+ * This is lead generation — runs on a continuous loop with SDR + Receptionist.
  *
  * Flow:
- *   startTrial(carrier)       — Run 4 pre-checks, send welcome email, create trial record
+ *   startTrial(carrier)       — Validate MC only, send welcome email, create trial record
  *   runTrialDay(carrierId, day) — Execute the scheduled task for a given trial day
- *   handleDay7(carrierId)     — Make conversion decision, trigger paid handoff or nurture drip
+ *   handleDay7(carrierId)     — Offer commission structure or move to nurture drip
+ *
+ * Trial rules:
+ *   - No contract during trial
+ *   - No charge to carrier during trial
+ *   - Erin dispatches REAL loads — carrier earns real money
+ *   - Single gate: valid active MC on FMCSA SAFER
+ *   - After trial: offer 8% commission (10% first 90 days, drops to 8%). No monthly fee.
  *
  * Trial Day Schedule:
  *   Day 1: Welcome email + what to expect
- *   Day 2-4: Erin dispatches real loads (tracked automatically)
- *   Day 5: Send recap email (loads found, estimated revenue, time saved)
+ *   Day 2-6: Erin dispatches real loads (tracked automatically)
+ *   Day 5: Send recap email (loads dispatched, revenue earned, time saved)
  *   Day 6: Check-in email
- *   Day 7: Conversion decision → paid handoff OR nurture drip
+ *   Day 7: Conversion offer (8% commission) OR nurture drip → loop back to SDR
  */
 
 import 'dotenv/config'
 import Anthropic from '@anthropic-ai/sdk'
 import Airtable from 'airtable'
-import { vetCarrier } from '../agents/compliance/compliance.js'
 import { evaluateEscalation } from '../agents/maya/maya.js'
 import { logDecision } from '../decision_engine/engine.js'
 import { AgentMemory } from '../shared/memory.js'
@@ -113,19 +120,22 @@ Or just reply to this email.
   }),
 
   conversion_offer: (carrier, stats) => ({
-    subject: `Ready to go full-time? Here's what happens next`,
+    subject: `Ready to continue? Here's how it works`,
     body: `Hi ${carrier.contact_name || carrier.company_name},
 
-Based on your trial results — ${stats.loads_found} loads, ~$${stats.estimated_revenue.toLocaleString()} estimated revenue — this is working.
+Your trial is done. Here's what we found: ${stats.loads_found} loads dispatched, ~$${stats.estimated_revenue.toLocaleString()} in gross revenue.
 
-To go full-time:
-- Commission: 10% of load revenue (drops to 8% after 90 days)
-- No monthly fees — we earn when you earn
-- We handle the load board, broker negotiations, and paperwork
+If you want to keep going, here's the deal:
 
-Next step: I'll send you a service agreement via DocuSign. Takes 5 minutes to sign.
+- We charge 8% commission per load — that's it
+- No monthly fee. No retainer. No setup cost.
+- We only make money when you make money.
 
-Ready? Reply "yes" and I'll send it over. Or book a call: ${process.env.CALENDLY_LINK || '[calendly link]'}
+For your first 90 days, the rate is 10%. After that it drops to 8% and stays there.
+
+To continue: reply "yes" and I'll send over the carrier agreement. Takes 5 minutes.
+
+Not ready? No problem. I'll check back in 30 days.
 
 — AI Dispatch Team`
   }),
@@ -146,45 +156,34 @@ Either way, good luck out there.
   })
 }
 
-// ─── Pre-Trial Checks ─────────────────────────────────────────────────────────
+// ─── MC Validation (Single Trial Gate) ───────────────────────────────────────
 
 /**
- * Run all 4 pre-trial checks against FMCSA/compliance data.
+ * Validate carrier MC number before starting trial.
+ * This is the ONLY gate — trial is free lead gen, not a compliance screen.
+ * Load-level Iron Rules (safety rating, authority age, etc.) apply per-load when Erin dispatches.
+ *
  * @returns {{ passed: boolean, failures: string[], warnings: string[] }}
  */
 async function runPreChecks(carrier) {
-  console.log(`[trial] Running pre-checks for ${carrier.company_name} (MC ${carrier.mc_number})`)
+  console.log(`[trial] Validating MC for ${carrier.company_name} (MC ${carrier.mc_number})`)
   const failures = []
   const warnings = []
 
-  // Check 1: MC# active on FMCSA SAFER
+  // Only check: MC number must be present and valid (active, authorized for property)
   if (!carrier.mc_number) {
-    failures.push('MC number not provided — required to verify operating authority')
+    failures.push('MC number not provided — required to dispatch legally')
+    return { passed: false, failures, warnings }
   }
 
-  // Check 2-4: Use compliance agent (authority age, safety rating, insurance)
-  const vetResult = await vetCarrier({
-    mc_number: carrier.mc_number,
-    dot_number: carrier.dot_number,
-    company_name: carrier.company_name,
-    safety_rating: carrier.safety_rating,
-    authority_start_date: carrier.authority_start_date,
-    insurance_exp_date: carrier.insurance_exp_date
-  })
-
-  if (!vetResult.passed) {
-    for (const flag of vetResult.flags) {
-      if (flag.startsWith('IRON RULE') || flag.startsWith('BLOCKED')) {
-        failures.push(flag)
-      } else if (flag.startsWith('WARNING')) {
-        warnings.push(flag)
-      }
-    }
-  }
-
-  // Check: Operating authority must say "Authorized for Property"
+  // Check FMCSA operating authority status
   if (carrier.operating_authority && !carrier.operating_authority.includes('Property')) {
-    failures.push(`Operating authority "${carrier.operating_authority}" — must be Authorized for Property`)
+    failures.push(`MC ${carrier.mc_number} is not "Authorized for Property" on FMCSA SAFER — cannot dispatch without valid authority`)
+  }
+
+  // Soft warnings (don't block trial — Erin handles these per-load)
+  if (carrier.safety_rating === 'Conditional' || carrier.safety_rating === 'Unsatisfactory') {
+    warnings.push(`Safety rating is ${carrier.safety_rating} — some loads may be restricted per Iron Rules, but trial can proceed`)
   }
 
   return { passed: failures.length === 0, failures, warnings }
@@ -267,7 +266,9 @@ async function sendEmail(to, emailContent) {
 
 /**
  * Start a new 7-day free trial for a carrier.
- * Runs 4 pre-checks. Sends welcome email if passed, failure email if not.
+ * Single gate: MC must be valid and active on FMCSA SAFER.
+ * No contract, no charge, no commitment during trial — pure lead gen.
+ * Sends welcome email if MC valid, rejection email if not.
  *
  * @param {object} carrier
  * @param {string} carrier.company_name

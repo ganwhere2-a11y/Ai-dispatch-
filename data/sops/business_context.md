@@ -33,7 +33,6 @@ The owner does not dispatch manually. The agents do it. The owner only makes Tie
 |---|---|---|
 | Dispatch commission (existing carrier) | 8% of gross load rate | Per load booked |
 | Dispatch commission (new carrier, first 90 days) | 10% of gross load rate | Per load booked |
-| Monthly dispatch retainer (paid tier) | $350/month | After 7-day trial converts |
 
 **Revenue target:** $68,000/week = $272,000/month at full scale
 
@@ -51,10 +50,13 @@ The owner does not dispatch manually. The agents do it. The owner only makes Tie
 
 ## How We Acquire Carriers
 
-1. **FMCSA scraping** — Sales agent scrapes FMCSA database for qualifying carriers (dry van, 30+ days authority, satisfactory rating)
+1. **FMCSA scraping** — Sales/SDR agent scrapes FMCSA database for qualifying carriers (dry van, active MC)
 2. **Outreach sequence** — 4-email sequence over 10 days, personalized per carrier profile
-3. **Inbound calls** — Receptionist handles 24/7 via Retell AI, routes qualified leads to Onboarding
-4. **Ads (future)** — SDR agents targeting 500–1,000 carrier prospects via paid ads
+3. **Inbound calls** — Receptionist handles 24/7 via Retell AI, validates MC, routes to Onboarding
+4. **7-day free trial** — Erin dispatches REAL loads at no charge. Single gate: valid MC only. No contract.
+5. **Ads (future)** — SDR agents targeting 500–1,000 carrier prospects via paid ads
+
+**Trial model:** SDR finds leads → Receptionist validates MC → Onboarding starts trial → Erin dispatches real loads free → Day 7 offer (8% commission, no monthly fee) → Convert or nurture → Loop back to SDR. Always running.
 
 ---
 

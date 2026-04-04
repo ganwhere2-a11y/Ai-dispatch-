@@ -103,7 +103,7 @@ async function getLiveData() {
     ],
     decisions_needed: [
       { agent: 'Erin', text: 'Quote $5,400 — Chicago to Memphis, 487mi @ $3.20/RPM. New carrier first load. Compliance cleared.' },
-      { agent: 'Onboarding', text: 'TruckPro LLC trial → paid at $350/mo? 3 clean loads, no flags.' }
+      { agent: 'Onboarding', text: 'TruckPro LLC trial → 3 loads dispatched, no flags. Offer 8% commission agreement?' }
     ]
   }
 }

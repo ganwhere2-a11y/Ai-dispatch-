@@ -164,7 +164,7 @@ const SYNTHETIC_DECISIONS = [
 
   { agent:'Onboarding', situation_type:'trial_conversion',
     inputs:{ carrier:'Sunrise Logistics', trial_day:7, loads_completed:3, satisfaction:'positive', conversion_call:true },
-    recommendation:'Convert to paid. 3 loads completed, positive feedback. Send $350/mo agreement.',
+    recommendation:'Convert to paid. 3 loads completed, positive feedback. Offer 8% commission (10% first 90 days) — no monthly fee.',
     owner_decision:'ACCEPT', outcome:'Signed same day. Became a regular 2-load/week carrier.',
     lesson:'Day 7 carriers who complete 3+ trial loads convert at 85%+ rate.',
     confidence_before:0.88, confidence_after:0.94, autonomous_eligible:true },

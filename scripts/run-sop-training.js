@@ -209,7 +209,7 @@ function onboardingTrial(i) {
     agent: 'Onboarding', situation_type: 'trial_conversion',
     inputs: { carrier: `TrialCarrier_${i}`, trial_day: day7 ? 7 : 5, loads_completed: loads, satisfaction: loads >= 2 ? 'positive' : 'neutral' },
     recommendation: loads >= 2
-      ? `Convert to paid — ${loads} loads completed. Send $350/mo agreement.`
+      ? `Convert to paid — ${loads} loads completed. Offer 8% commission (10% first 90 days).`
       : `Continue trial — only ${loads} load completed. Schedule Day 7 call.`,
     owner_decision: 'ACCEPT',
     outcome: loads >= 2 ? 'Converted to paid. Regular carrier.' : 'Trial extended. Converted on Day 9.',
