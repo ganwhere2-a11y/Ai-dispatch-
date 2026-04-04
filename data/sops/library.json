@@ -229,8 +229,8 @@
         "value": "Owner approves Tier-2 load-value escalations within 5 minutes when data package is complete (load ID, route, profit, carrier).",
         "source": "seed-training-data",
         "importance": 5,
-        "recall_count": 4,
-        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "recall_count": 5,
+        "last_recalled": "2026-04-04T11:17:33.646Z",
         "synthetic": true
       },
       {
@@ -240,8 +240,8 @@
         "value": "Attorney/legal contacts are always Tier-3. Owner responds within 15 minutes on average.",
         "source": "seed-training-data",
         "importance": 5,
-        "recall_count": 5,
-        "last_recalled": "2026-04-01T06:15:44.762Z",
+        "recall_count": 6,
+        "last_recalled": "2026-04-04T11:17:33.646Z",
         "synthetic": true
       },
       {
@@ -251,8 +251,8 @@
         "value": "Owner reads morning report between 6:05-6:20 AM. High-priority items should be first, not buried.",
         "source": "seed-training-data",
         "importance": 4,
-        "recall_count": 1,
-        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "recall_count": 2,
+        "last_recalled": "2026-04-04T11:17:33.646Z",
         "synthetic": true
       },
       {
@@ -262,8 +262,8 @@
         "value": "Owner prefers Telegram over SMS for Tier-2. Uses SMS only for Tier-3.",
         "source": "seed-training-data",
         "importance": 4,
-        "recall_count": 7,
-        "last_recalled": "2026-04-02T06:15:44.762Z",
+        "recall_count": 8,
+        "last_recalled": "2026-04-04T11:17:33.646Z",
         "synthetic": true
       }
     ],
