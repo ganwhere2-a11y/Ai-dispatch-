@@ -1,0 +1,8 @@
+Lead Name: Mark Johnson
+Role: Head of Operations
+Company Size: 500 employees
+Industry: SaaS
+Inquiry: We are evaluating pricing page tools to automate internal workflows and are looking to move quickly.
+Engagement:
+  - Downloaded pricing page
+  - Requested demo
