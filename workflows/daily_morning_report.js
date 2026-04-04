@@ -258,23 +258,23 @@ export async function generateAndSendReport() {
     }
   }
 
-  // Flag anything that needs immediate attention
+  // Flag anything that needs immediate attention — non-blocking, never kills the report
   if (activeLoads.needs_attention.length > 0) {
-    await evaluateEscalation({
+    evaluateEscalation({
       type: 'loads_need_pickup_today',
       agent: 'workflow/daily_morning_report',
       data: { count: activeLoads.needs_attention.length, loads: activeLoads.needs_attention.map(l => l.load_id) },
       ref_id: 'morning_check'
-    })
+    }).catch(err => console.error('[morning_report] Escalation check failed silently:', err.message))
   }
 
   if (trials.day7_today > 0) {
-    await evaluateEscalation({
+    evaluateEscalation({
       type: 'trial_day7_conversion',
       agent: 'workflow/daily_morning_report',
       data: { count: trials.day7_today, carriers: trials.trials.filter(t => t.day === 7).map(t => t.company) },
       ref_id: 'morning_check'
-    })
+    }).catch(err => console.error('[morning_report] Escalation check failed silently:', err.message))
   }
 
   // Send report via Maya
