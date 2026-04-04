@@ -13,6 +13,7 @@ import fs from 'fs/promises'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
+app.use(express.json())
 const PORT = process.env.PORT || 3000
 
 // ── Live data builder ─────────────────────────────────────────────────────────
@@ -111,6 +112,25 @@ async function getLiveData() {
 app.get('/api/data', async (req, res) => {
   const data = await getLiveData()
   res.json(data)
+})
+
+// ── Chat proxy (keeps API key server-side) ────────────────────────────────────
+app.post('/api/chat', async (req, res) => {
+  const { messages, system } = req.body
+  if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'your_key') {
+    return res.json({ content: [{ text: '⚠️ ANTHROPIC_API_KEY not set in Railway Variables. Add it to enable live AI responses.' }] })
+  }
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1024, system, messages })
+    })
+    const data = await r.json()
+    res.json(data)
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
 })
 
 // ── Health check ──────────────────────────────────────────────────────────────
