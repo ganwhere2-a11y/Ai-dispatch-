@@ -421,7 +421,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
             <label>Company Website</label>
             <div style="display:flex;gap:7px">
               <input id="kb-site" placeholder="https://aidispatch.com" style="flex:1">
-              <button style="padding:8px 14px;border-radius:7px;background:var(--surfHi);border:1px solid var(--border);color:var(--mid);font-size:11px;cursor:pointer;white-space:nowrap">Auto-Fill ✦</button>
+              <button onclick="autoFillFromSite()" style="padding:8px 14px;border-radius:7px;background:var(--surfHi);border:1px solid var(--border);color:var(--mid);font-size:11px;cursor:pointer;white-space:nowrap">Auto-Fill ✦</button>
             </div>
             <div style="font-size:10px;color:var(--low);margin-top:3px">Auto-fill your business details from your website</div>
           </div>
@@ -512,7 +512,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
             <input type="checkbox" id="n-sms" checked style="accent-color:var(--green)"> SMS for Tier 3 escalations
           </label>
         </div>
-        <button class="sv-save" onclick="alert('Preferences saved.')">Save Changes</button>
+        <button class="sv-save" onclick="savePersonalisation()">Save Changes</button>
       </div>
 
       <!-- INTEGRATIONS -->
@@ -1367,11 +1367,72 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 })
 
+// ── AUTO-FILL FROM SITE ───────────────────────────────────────────────────────
+async function autoFillFromSite() {
+  const url = document.getElementById('kb-site').value.trim()
+  if(!url) { alert('Paste your website URL first, then click Auto-Fill.'); return }
+  const bizEl = document.getElementById('kb-biz')
+  const goalEl = document.getElementById('kb-goal')
+  bizEl.value = 'Loading…'
+  try {
+    const res = await fetch('/api/chat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        system: 'You help freight dispatch businesses set up their AI Command Center. Be concise.',
+        messages:[{role:'user',content:`Based on the website URL "${url}", write a 2-sentence description of what this freight dispatch business does — their niche, services, and market. Then on a new line write their likely revenue and growth goal in one sentence. Keep it under 60 words total.`}]
+      })
+    })
+    const d = await res.json()
+    const text = d.content?.[0]?.text || ''
+    if(text && !text.includes('⚠️')) {
+      const lines = text.split('\n').filter(l=>l.trim())
+      bizEl.value = lines[0] || text
+      if(lines[1]) goalEl.value = lines[1]
+    } else {
+      bizEl.value = 'Medical freight dispatch — dry van carriers, USA market'
+      goalEl.value = '$272K/month revenue · 200 trucks under management · Year 1 USA'
+      alert('AI auto-fill requires your ANTHROPIC_API_KEY in Railway Variables. Default values loaded.')
+    }
+  } catch {
+    bizEl.value = 'Medical freight dispatch — dry van carriers, USA market'
+    alert('Could not connect to AI. Add ANTHROPIC_API_KEY in Railway Variables.')
+  }
+}
+
+// ── SAVE PERSONALISATION ─────────────────────────────────────────────────────
+function savePersonalisation() {
+  const data = {
+    tone: document.getElementById('p-tone')?.value,
+    briefingTime: document.getElementById('p-time')?.value,
+    timezone: document.getElementById('p-tz')?.value,
+    autoApprove: document.getElementById('p-auto')?.value,
+    notifTelegram: document.getElementById('n-tg')?.checked,
+    notifEmail: document.getElementById('n-email')?.checked,
+    notifSms: document.getElementById('n-sms')?.checked,
+  }
+  localStorage.setItem('ai_dispatch_personalisation', JSON.stringify(data))
+  alert('Preferences saved.')
+}
+
+function loadPersonalisation() {
+  try {
+    const data = JSON.parse(localStorage.getItem('ai_dispatch_personalisation')||'{}')
+    if(data.tone) document.getElementById('p-tone').value = data.tone
+    if(data.briefingTime) document.getElementById('p-time').value = data.briefingTime
+    if(data.timezone) document.getElementById('p-tz').value = data.timezone
+    if(data.autoApprove) document.getElementById('p-auto').value = data.autoApprove
+    if(data.notifTelegram != null) document.getElementById('n-tg').checked = data.notifTelegram
+    if(data.notifEmail != null) document.getElementById('n-email').checked = data.notifEmail
+    if(data.notifSms != null) document.getElementById('n-sms').checked = data.notifSms
+  } catch {}
+}
+
 // ── INIT ─────────────────────────────────────────────────────────────────────
 buildSidebar()
 switchMarket('usa')
 loadData()
 loadProfile()
+loadPersonalisation()
 renderSavedKb()
 buildIntegrationsList()
 loadServerSops()
