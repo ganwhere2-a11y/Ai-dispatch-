@@ -6,20 +6,15 @@ Evaluates lead information and assigns qualification status.
 Reads from input.txt, writes to lead_qualification.json and lead_qualification.txt
 
 Requirements:
-  pip install openai
-  export OPENAI_API_KEY=your_key_here
-
-To use Claude instead of OpenAI:
-  Replace: from openai import OpenAI / client = OpenAI()
-  With:    import anthropic / client = anthropic.Anthropic()
-  And update the client.chat.completions.create() call to client.messages.create()
+  pip install anthropic
+  export ANTHROPIC_API_KEY=your_key_here
 """
 
 import json
-from openai import OpenAI
+import anthropic
 from datetime import date
 
-client = OpenAI()  # requires OPENAI_API_KEY
+client = anthropic.Anthropic()  # requires ANTHROPIC_API_KEY
 
 SYSTEM_PROMPT = """
 You are a Lead Qualification Agent.
@@ -56,15 +51,15 @@ def read_input(path="input.txt"):
 
 
 def qualify_lead(prompt_text):
-    response = client.chat.completions.create(
-        model="gpt-4.1-mini",
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=1024,
+        system=SYSTEM_PROMPT,
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt_text}
-        ],
-        temperature=0.3
+        ]
     )
-    return json.loads(response.choices[0].message.content)
+    return json.loads(response.content[0].text)
 
 
 def save_outputs(data):

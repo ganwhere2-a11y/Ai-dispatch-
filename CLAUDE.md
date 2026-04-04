@@ -75,7 +75,7 @@ agents/          Each agent is a self-contained folder:
   maya/          Executive Assistant — morning reports, escalation routing
   erin/          Dispatcher — core freight engine, Iron Rules enforced here
   compliance/    Gatekeeper — vets every carrier and load before booking
-  receptionist/  24/7 voice AI (Retell) — call routing and lead capture
+  receptionist/  Collette — 24/7 voice AI (Retell) — call routing and lead capture
   sales/         Lead generation — FMCSA API scraping, email sequences
   onboarding/    7-day free trial funnel + paid carrier setup
   support/       Client/carrier retention, complaint triage
@@ -102,7 +102,7 @@ shared/
                  Data stored in data/sops/library.json
 
 data/            JSON persistence stores (not the primary DB — Airtable is)
-  calls/         Receptionist transcripts
+  calls/         Collette call transcripts
   content/       Marketer content calendar
   decisions/     Decision Engine learning log
   emails/        Outreach log
@@ -119,7 +119,7 @@ sops/            Human-readable standard operating procedures per agent
   maya_sop.md
   erin_sop.md
   compliance_sop.md
-  receptionist_sop.md
+  collette_sop.md
   sales_sop.md
 
 templates/       Email and document templates (BOL, rate confirmation, invoice, carrier emails)
@@ -145,7 +145,7 @@ ai-os/          System architecture documentation (blueprint, integrations, gove
 ```bash
 npm run maya              # Start Maya (executive assistant)
 npm run erin              # Start Erin (dispatcher)
-npm run receptionist      # Start Retell webhook handler
+npm run receptionist      # Start Collette (Retell webhook handler)
 npm run sales             # Start Sales outreach agent
 npm run compliance        # Start Compliance agent
 npm run onboarding        # Start Onboarding agent
@@ -237,7 +237,7 @@ This is implemented in `agents/maya/maya.js` → `evaluateEscalation()`.
 ---
 
 **Model selection:**
-- `claude-sonnet-4-6` — default for all agents (Erin, Maya, Sales, Support, Receptionist, Onboarding, Compliance, Marketer)
+- `claude-sonnet-4-6` — default for all agents (Erin, Maya, Sales, Support, Collette, Onboarding, Compliance, Marketer)
 - `claude-opus-4-6` — Shadow Agent learning, complex compliance edge cases
 - `claude-haiku-4-5-20251001` — quick checks only (Iron Rule validation, format checks, duplicate detection)
 

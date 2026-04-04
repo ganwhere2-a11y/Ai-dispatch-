@@ -90,7 +90,7 @@ async function getLiveData() {
       { name: 'Sales',       role: 'Lead Gen',     status: 'green',  msg: '14 leads in pipeline' },
       { name: 'Onboarding',  role: 'Trial Funnel', status: 'green',  msg: '3 trials active' },
       { name: 'Support',     role: 'Retention',    status: 'green',  msg: 'No open complaints' },
-      { name: 'Receptionist',role: 'Voice AI',     status: 'green',  msg: '3 calls handled today' },
+      { name: 'Collette',     role: 'Voice AI',     status: 'green',  msg: '3 calls handled today' },
       { name: 'Marketer',    role: 'Content',      status: 'green',  msg: 'Content calendar live' },
       { name: 'CEO Shadow',  role: 'Observer',     status: 'purple', msg: `Phase ${shadowData.phase || 1} · ${shadowData.decisions || 47} decisions logged` }
     ],
