@@ -30,14 +30,37 @@ This is pure lead generation. The trial runs on a loop — SDR finds leads, Rece
 
 **Trial loop (continuous):** SDR finds leads → Receptionist qualifies MC → You run trial → Day 7 offer → convert or nurture → SDR feeds next batch. Always running.
 
+## Drug Test / NDS Clearinghouse (Required Before First Load — Trial OR Paid)
+
+Before Erin books the very first load for any carrier — trial or paid — the carrier must be
+enrolled in the FMCSA Drug & Alcohol Clearinghouse.
+
+**Process:**
+1. Send carrier the NDS enrollment link and instructions
+2. Carrier pays $100/year directly to NDS (not through us)
+3. Carrier completes enrollment and provides confirmation
+4. Compliance verifies enrollment via FMCSA Clearinghouse lookup
+5. Log clearance date in Airtable carrier record
+6. Only after clearance is confirmed → Erin begins dispatching
+
+**If carrier has not completed this:**
+- Hold all loads — do not dispatch
+- Send reminder with link: "We're ready to start your trial. One thing needed first — [link]"
+- If no action in 48 hours → escalate to Maya as tier-1
+
+**This is federal compliance. No exceptions. Not even for the trial.**
+
+---
+
 ## Carrier Paid Onboarding (After Trial Converts)
 
 1. Explain commission: 10% for first 90 days, drops to 8% after — no monthly fees, we earn when they earn
 2. Collect: W-9 form, insurance certificate, MC authority copy, signed carrier agreement
-3. Set up in Airtable: create carrier record, assign commission rate (10% for new)
-4. Confirm lane preferences and truck type
-5. Send welcome packet with how dispatching works, Erin's schedule, contact info
-6. Erin takes over immediately — no gap between trial and active dispatch
+3. Verify NDS/Clearinghouse is already on file (from trial) — if not, complete it now
+4. Set up in Airtable: create carrier record, assign commission rate (10% for new)
+5. Confirm lane preferences and truck type
+6. Send welcome packet with how dispatching works, Erin's schedule, contact info
+7. Erin takes over immediately — no gap between trial and active dispatch
 
 ## Client (Shipper) Onboarding
 
