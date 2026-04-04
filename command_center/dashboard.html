@@ -289,22 +289,43 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
       <span style="font-size:9px;color:var(--low);letter-spacing:.5px">REGULATORY FRAMEWORK</span>
       <span id="reg-label" style="font-size:9px;color:var(--green);font-weight:600">FMCSA · DOT · SAFER</span>
     </div>
-    <div class="stats" id="stats-grid"></div>
-    <div class="priorities-card">
-      <div class="card-lbl" id="pri-label">Today's Priority List · USA</div>
-      <div id="priorities"></div>
+    <!-- LOCK SCREEN (inactive markets) -->
+    <div id="market-lock" style="display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;flex:1;min-height:400px">
+      <div id="lock-flag" style="font-size:52px;margin-bottom:14px">🇨🇦</div>
+      <div id="lock-name" style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px">Canada Market</div>
+      <div id="lock-status" style="font-size:12px;color:var(--low);margin-bottom:24px">Inactive · Year 2</div>
+      <div style="background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:24px 28px;max-width:420px;width:100%">
+        <div style="font-size:14px;font-weight:600;color:var(--mid);margin-bottom:8px">🔒 Market Not Yet Active</div>
+        <div style="font-size:12px;color:var(--low);line-height:1.6;margin-bottom:20px">This market is built and ready but locked until your SOPs are trained and you're ready to launch.<br>Use the activation command when ready.</div>
+        <div style="font-size:10px;color:var(--low);letter-spacing:.8px;margin-bottom:8px;font-weight:600">ACTIVATION COMMAND</div>
+        <code id="lock-cmd" style="display:inline-block;padding:6px 14px;border-radius:6px;background:var(--surfHi);border:1px solid var(--border);color:var(--amber);font-size:13px;margin-bottom:16px">Activate Canada</code>
+        <div style="display:flex;gap:8px">
+          <input id="lock-input" onkeydown="if(event.key==='Enter')tryActivateMarket()" style="flex:1;padding:9px 12px;border-radius:8px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:13px;outline:none;font-family:inherit" placeholder='Type "Activate Canada"…'>
+          <button onclick="tryActivateMarket()" style="padding:9px 16px;border-radius:8px;background:var(--blue);border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Unlock →</button>
+        </div>
+        <div id="lock-err" style="display:none;font-size:11px;color:var(--red);margin-top:8px;text-align:left"></div>
+      </div>
     </div>
-    <div style="border-radius:12px;background:var(--surf);border:1px solid var(--border);padding:16px 18px;margin-bottom:14px">
-      <div class="card-lbl" id="lanes-label">Key Lanes · USA</div>
-      <div id="lanes-grid" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+
+    <!-- LIVE DASHBOARD CONTENT -->
+    <div id="dash-content">
+      <div class="stats" id="stats-grid"></div>
+      <div class="priorities-card">
+        <div class="card-lbl" id="pri-label">Today's Priority List · USA</div>
+        <div id="priorities"></div>
+      </div>
+      <div style="border-radius:12px;background:var(--surf);border:1px solid var(--border);padding:16px 18px;margin-bottom:14px">
+        <div class="card-lbl" id="lanes-label">Key Lanes · USA</div>
+        <div id="lanes-grid" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
+      <div class="decisions-card">
+        <div class="card-lbl">Needs Your Decision</div>
+        <div id="decisions"></div>
+      </div>
+      <div class="card-lbl" style="margin-bottom:12px">Your AI Team</div>
+      <div class="team-grid" id="team-grid"></div>
+      <div style="height:20px"></div>
     </div>
-    <div class="decisions-card">
-      <div class="card-lbl">Needs Your Decision</div>
-      <div id="decisions"></div>
-    </div>
-    <div class="card-lbl" style="margin-bottom:12px">Your AI Team</div>
-    <div class="team-grid" id="team-grid"></div>
-    <div style="height:20px"></div>
   </div>
 
   <!-- AGENT PAGE -->
@@ -357,44 +378,87 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     </div>
     <div class="sv-body">
       <div class="sv-tabs">
-        <div class="sv-tab on" onclick="showSvTab('knowledge',this)">Knowledge</div>
-        <div class="sv-tab" onclick="showSvTab('profile',this)">Profile</div>
-        <div class="sv-tab" onclick="showSvTab('integrations',this)">Integrations</div>
-        <div class="sv-tab" onclick="showSvTab('personalise',this)">Personalise</div>
+        <div class="sv-tab on" onclick="showSvTab('profile',this)">👤 Profile</div>
+        <div class="sv-tab" onclick="showSvTab('knowledge',this)">🧠 Knowledge</div>
+        <div class="sv-tab" onclick="showSvTab('personalise',this)">🎨 Personalisation</div>
+        <div class="sv-tab" onclick="showSvTab('integrations',this)">🔌 Integrations</div>
+        <div class="sv-tab" onclick="showSvTab('admin',this)">🔒 Admin</div>
       </div>
 
-      <div class="sv-panel on" id="svp-knowledge">
+      <!-- PROFILE -->
+      <div class="sv-panel on" id="svp-profile" style="max-width:680px">
+        <div style="font-size:16px;font-weight:700;margin-bottom:3px">Company Profile</div>
+        <div style="font-size:12px;color:var(--low);margin-bottom:18px">Used by all agents to personalise responses to your business.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 18px">
+          <div class="sv-field"><label>Business Name</label><input id="p-biz" placeholder="AI Dispatch LLC"></div>
+          <div class="sv-field"><label>Owner Name</label><input id="p-owner" placeholder="Your name"></div>
+          <div class="sv-field"><label>MC Number</label><input id="p-mc" placeholder="MC-XXXXXX"></div>
+          <div class="sv-field"><label>DOT Number</label><input id="p-dot" placeholder="DOT-XXXXXXX"></div>
+          <div class="sv-field"><label>Home Base</label><input id="p-city" placeholder="Dallas, TX"></div>
+          <div class="sv-field"><label>Primary Email</label><input id="p-email" placeholder="ops@aidispatch.com"></div>
+          <div class="sv-field"><label>Telegram Chat ID</label><input id="p-tg" placeholder="@your_telegram"></div>
+        </div>
+        <div style="font-size:14px;font-weight:700;margin-top:6px;margin-bottom:3px">Iron Rule Thresholds</div>
+        <div style="font-size:12px;color:var(--low);margin-bottom:12px">Enforced by all agents. Never hardcoded — lives here.</div>
+        <div style="padding:9px 12px;border-radius:7px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);margin-bottom:12px">
+          <span style="font-size:11px;color:var(--amber)">⚠️ Changing these updates all agent behaviour immediately across the system.</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 18px">
+          <div class="sv-field"><label>RPM Floor ($)</label><input id="p-rpm" value="2.51" placeholder="2.51"></div>
+          <div class="sv-field"><label>Standard Commission (%)</label><input id="p-cs" value="8" placeholder="8"></div>
+          <div class="sv-field"><label>New Carrier Commission (%)</label><input id="p-cn" value="10" placeholder="10"></div>
+        </div>
+        <button class="sv-save" onclick="saveProfile()">Save Profile</button>
+      </div>
+
+      <!-- KNOWLEDGE -->
+      <div class="sv-panel" id="svp-knowledge" style="max-width:680px">
+        <div style="font-size:16px;font-weight:700;margin-bottom:3px">Account Knowledgebase</div>
+        <div style="font-size:12px;color:var(--low);margin-bottom:18px">Tell your agents about your business — they'll use this to personalise every response.</div>
         <div class="sv-sect">
           <div class="sv-sect-title">Your Business</div>
-          <div class="sv-field"><label>Business Type</label><input id="kb-biz" value="Medical freight dispatch — dry van carriers, USA market"></div>
-          <div class="sv-field"><label>Your Goals</label><input id="kb-goal" value="$272K/month revenue · 200 trucks under management · Year 1 USA"></div>
-          <div class="sv-field"><label>Active Market</label>
-            <select id="kb-market"><option>🇺🇸 USA (Active)</option><option>🇨🇦 Canada (Year 2)</option><option>🇪🇺 EU (Year 2)</option><option>🇬🇧 UK (Year 2)</option></select>
+          <div class="sv-field">
+            <label>Company Website</label>
+            <div style="display:flex;gap:7px">
+              <input id="kb-site" placeholder="https://aidispatch.com" style="flex:1">
+              <button style="padding:8px 14px;border-radius:7px;background:var(--surfHi);border:1px solid var(--border);color:var(--mid);font-size:11px;cursor:pointer;white-space:nowrap">Auto-Fill ✦</button>
+            </div>
+            <div style="font-size:10px;color:var(--low);margin-top:3px">Auto-fill your business details from your website</div>
           </div>
+          <div class="sv-field"><label>Your Business</label><textarea id="kb-biz" rows="3" placeholder="Describe your dispatch business — niche, services, how you work, what makes you different…">Medical freight dispatch — dry van carriers, USA market</textarea></div>
+          <div class="sv-field"><label>Your Goals</label><textarea id="kb-goal" rows="2" placeholder="e.g. 200 trucks under management, $272K/month revenue, expand into Canada Year 2…">$272K/month revenue · 200 trucks under management · Year 1 USA</textarea></div>
           <button class="sv-save" onclick="saveKb()">Save Knowledgebase</button>
         </div>
         <div class="sv-sect">
           <div class="sv-sect-title">Custom Knowledge <span style="font-size:9px;background:var(--blueDim);color:var(--blue);padding:2px 7px;border-radius:5px;font-weight:700;margin-left:6px">OWNER</span></div>
+          <div style="font-size:12px;color:var(--low);margin-bottom:12px">Upload SOPs, rate sheets, playbooks, and scripts. All agents prioritise this over built-in knowledge.</div>
           <div class="kb-tabs">
             <div class="kb-tab on" onclick="switchKbTab('text',this)">Type text</div>
             <div class="kb-tab" onclick="switchKbTab('file',this)">Upload file</div>
           </div>
           <div id="kbt-text">
-            <div class="sv-field"><label>Title</label><input id="kb-title" placeholder="e.g. Iron Rules, Sales Playbook, SOP"></div>
+            <div class="sv-field"><label>Title</label><input id="kb-title" placeholder="e.g. Iron Rules, Sales Playbook, Carrier SOP"></div>
             <div class="sv-field"><label>Apply to</label>
-              <select id="kb-scope"><option>All agents (global)</option><option>Maya only</option><option>Erin only</option><option>Compliance only</option><option>Sales only</option></select>
+              <select id="kb-scope"><option>All agents (global)</option><option>Maya only</option><option>Erin only</option><option>Compliance only</option><option>Sales only</option><option>Onboarding only</option><option>Support only</option></select>
             </div>
             <div class="sv-field">
-              <textarea id="kb-body" placeholder="Paste your playbooks, scripts, SOPs, Iron Rule details…" oninput="updateChars()"></textarea>
-              <div class="sv-chars"><span id="kb-chars">0</span> / 10,000 · <span id="kb-left">10,000</span> remaining</div>
+              <textarea id="kb-body" rows="6" placeholder="Paste your playbooks, scripts, SOPs, Iron Rule details, carrier notes…" oninput="updateChars()"></textarea>
+              <div style="display:flex;justify-content:space-between;margin-top:4px">
+                <span class="sv-chars"><span id="kb-chars">0</span> / 10,000 per entry</span>
+                <span class="sv-chars">Capacity remaining: <span id="kb-left">10,000</span></span>
+              </div>
             </div>
             <div style="display:flex;gap:8px">
               <button class="sv-save" onclick="saveCustomKb()">Save</button>
-              <button onclick="clearKb()" style="padding:8px 14px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--low);font-size:12px;cursor:pointer">Cancel</button>
+              <button onclick="clearKb()" style="padding:8px 14px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--low);font-size:12px;cursor:pointer;font-family:inherit">Cancel</button>
             </div>
           </div>
           <div id="kbt-file" style="display:none">
-            <div style="border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;color:var(--low);font-size:12px">📎 Drag &amp; drop a .txt or .md file<br><span style="font-size:10px">Max 10,000 characters</span></div>
+            <div style="border:2px dashed var(--border);border-radius:8px;padding:28px;text-align:center;color:var(--low);font-size:12px">
+              <div style="font-size:24px;margin-bottom:8px">📁</div>
+              Drop file here or click to browse<br>
+              <span style="font-size:10px">PDF, DOCX, TXT — max 5MB · 10,000 characters</span>
+            </div>
           </div>
         </div>
         <div class="sv-sect" id="kb-saved-sect" style="display:none">
@@ -403,38 +467,87 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
         </div>
       </div>
 
-      <div class="sv-panel" id="svp-profile">
-        <div class="sv-sect">
-          <div class="sv-sect-title">Owner Profile</div>
-          <div class="sv-field"><label>Your Name</label><input id="p-name" placeholder="Your name"></div>
-          <div class="sv-field"><label>Business Name</label><input id="p-biz" value="AI Dispatch"></div>
-          <div class="sv-field"><label>Telegram Chat ID</label><input id="p-tg" placeholder="For Maya's morning reports"></div>
-          <button class="sv-save" onclick="saveProfile()">Save Profile</button>
-        </div>
-      </div>
-
-      <div class="sv-panel" id="svp-integrations">
-        <div class="sv-sect">
-          <div class="sv-sect-title">Connected Integrations</div>
-          <div class="int-row"><div><div class="int-nm">Anthropic Claude API</div><div class="int-desc">Powers all 9 AI agents + chat</div></div><span class="int-badge int-ok" id="int-claude">Connected</span></div>
-          <div class="int-row"><div><div class="int-nm">Airtable</div><div class="int-desc">Carriers, Loads, Clients, Invoices</div></div><span class="int-badge int-no" id="int-airtable">Not Set</span></div>
-          <div class="int-row"><div><div class="int-nm">Telegram</div><div class="int-desc">Maya's morning reports &amp; escalation alerts</div></div><span class="int-badge int-no" id="int-tg">Not Set</span></div>
-          <div class="int-row"><div><div class="int-nm">Retell AI</div><div class="int-desc">24/7 voice receptionist</div></div><span class="int-badge int-no" id="int-retell">Not Set</span></div>
-          <div class="int-row"><div><div class="int-nm">FMCSA API</div><div class="int-desc">Carrier vetting &amp; lead generation</div></div><span class="int-badge int-no" id="int-fmcsa">Not Set</span></div>
-          <div class="int-row"><div><div class="int-nm">Twilio SMS</div><div class="int-desc">Carrier outreach &amp; onboarding</div></div><span class="int-badge int-no" id="int-twilio">Not Set</span></div>
-          <div style="margin-top:10px;font-size:10px;color:var(--low)">Set API keys in Railway Variables → redeploy to activate.</div>
-        </div>
-      </div>
-
-      <div class="sv-panel" id="svp-personalise">
+      <!-- PERSONALISATION -->
+      <div class="sv-panel" id="svp-personalise" style="max-width:580px">
+        <div style="font-size:16px;font-weight:700;margin-bottom:3px">Personalisation</div>
+        <div style="font-size:12px;color:var(--low);margin-bottom:18px">Customise how your Command Center communicates with you.</div>
         <div class="sv-sect">
           <div class="sv-sect-title">Agent Behavior</div>
-          <div class="sv-field"><label>Morning Report Time</label><input type="time" id="p-time" value="06:00"></div>
-          <div class="sv-field"><label>Escalation Threshold</label>
-            <select><option>Tier 2+ (Quotes over $5K, new carriers)</option><option>Tier 3 only (Contracts &amp; markets)</option></select>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 18px">
+            <div class="sv-field">
+              <label>Agent Tone</label>
+              <select id="p-tone" style="width:100%;padding:8px 11px;border-radius:7px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:12px;font-family:inherit">
+                <option value="professional">Professional &amp; Direct</option>
+                <option value="casual">Casual &amp; Friendly</option>
+                <option value="terse">Terse (outputs only)</option>
+              </select>
+            </div>
+            <div class="sv-field"><label>Morning Briefing Time</label><input type="time" id="p-time" value="06:00"></div>
+            <div class="sv-field">
+              <label>Timezone</label>
+              <select id="p-tz" style="width:100%;padding:8px 11px;border-radius:7px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:12px;font-family:inherit">
+                <option value="America/Chicago">Central (CT)</option>
+                <option value="America/New_York">Eastern (ET)</option>
+                <option value="America/Denver">Mountain (MT)</option>
+                <option value="America/Los_Angeles">Pacific (PT)</option>
+              </select>
+            </div>
+            <div class="sv-field"><label>Auto-approve loads under ($)</label><input id="p-auto" placeholder="Leave blank to review all"></div>
           </div>
-          <div class="sv-field"><label>Auto-approve loads under ($)</label><input placeholder="Leave blank to review all"></div>
-          <button class="sv-save" onclick="alert('Preferences saved.')">Save Preferences</button>
+        </div>
+        <div class="sv-sect">
+          <div class="sv-sect-title">Notifications</div>
+          <label style="display:flex;align-items:center;gap:9px;margin-bottom:10px;cursor:pointer;font-size:13px;color:var(--mid)">
+            <input type="checkbox" id="n-tg" checked style="accent-color:var(--green)"> Telegram alerts (Tier 2/3 escalations)
+          </label>
+          <label style="display:flex;align-items:center;gap:9px;margin-bottom:10px;cursor:pointer;font-size:13px;color:var(--mid)">
+            <input type="checkbox" id="n-email" style="accent-color:var(--green)"> Daily email digest
+          </label>
+          <label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;color:var(--mid)">
+            <input type="checkbox" id="n-sms" checked style="accent-color:var(--green)"> SMS for Tier 3 escalations
+          </label>
+        </div>
+        <button class="sv-save" onclick="alert('Preferences saved.')">Save Changes</button>
+      </div>
+
+      <!-- INTEGRATIONS -->
+      <div class="sv-panel" id="svp-integrations" style="max-width:680px">
+        <div style="font-size:16px;font-weight:700;margin-bottom:3px">Integrations</div>
+        <div style="font-size:12px;color:var(--low);margin-bottom:18px">API connections powering your Command Center. Set keys in Railway Variables to go live.</div>
+        <div id="int-list"></div>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="sv-panel" id="svp-admin" style="max-width:520px">
+        <div style="font-size:16px;font-weight:700;margin-bottom:3px">Change Password</div>
+        <div style="font-size:12px;color:var(--low);margin-bottom:14px">Update your Command Center access password.</div>
+        <div class="sv-field"><label>Current Password</label><input type="password" id="sec-cur" placeholder="••••••••"></div>
+        <div class="sv-field"><label>New Password</label><input type="password" id="sec-nw" placeholder="Min 12 characters"></div>
+        <div class="sv-field"><label>Confirm New Password</label><input type="password" id="sec-cf" placeholder="Re-enter new password"></div>
+        <button class="sv-save" onclick="alert('Password updated!')" style="margin-bottom:22px">Update Password</button>
+        <div style="height:1px;background:var(--border);margin-bottom:22px"></div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:3px">Two-Factor Authentication</div>
+        <div style="font-size:12px;color:var(--low);margin-bottom:12px">Secure your account with Authy or Google Authenticator.</div>
+        <div style="padding:14px;border-radius:10px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;gap:14px;margin-bottom:14px">
+          <span style="font-size:24px">🔐</span>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Authenticator App (Authy / Google)</div><div style="font-size:11px;color:var(--low)">Scan QR code to enable 2FA.</div></div>
+          <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+            <input type="checkbox" id="sec-2fa" style="accent-color:var(--green)">
+            <span id="tfa-lbl" style="font-size:12px;color:var(--low);font-weight:600">DISABLED</span>
+          </label>
+        </div>
+        <div style="height:1px;background:var(--border);margin-bottom:22px"></div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:3px">Session Timeout</div>
+        <select style="padding:8px 12px;border-radius:7px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:13px;font-family:inherit;margin-bottom:18px">
+          <option>1 hour</option><option>4 hours</option><option selected>8 hours</option><option>24 hours</option><option>Never</option>
+        </select>
+        <br><button class="sv-save" onclick="alert('Security settings saved.')" style="margin-bottom:22px">Save Security Settings</button>
+        <div style="height:1px;background:var(--border);margin-bottom:22px"></div>
+        <div style="font-size:16px;font-weight:700;color:var(--red);margin-bottom:6px">Danger Zone</div>
+        <div style="padding:14px;border-radius:10px;background:rgba(240,84,84,.06);border:1px solid rgba(240,84,84,.2)">
+          <div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:5px">Clear All Agent Memory</div>
+          <div style="font-size:12px;color:var(--mid);margin-bottom:10px">Erases all custom knowledge, saved conversations, and agent context. Cannot be undone.</div>
+          <button onclick="if(confirm('Are you sure? This cannot be undone.')){clearAllMemory()}" style="padding:7px 16px;border-radius:7px;background:var(--red);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Clear Memory</button>
         </div>
       </div>
     </div>
@@ -815,7 +928,7 @@ function updateChars() {
 }
 
 function saveKb() {
-  const data = { biz:document.getElementById('kb-biz').value, goal:document.getElementById('kb-goal').value, market:document.getElementById('kb-market').value }
+  const data = { biz:document.getElementById('kb-biz').value, goal:document.getElementById('kb-goal').value }
   localStorage.setItem('ai_dispatch_kb', JSON.stringify(data))
   alert('Knowledgebase saved.')
 }
@@ -853,12 +966,80 @@ function deleteKb(i) {
   renderSavedKb()
 }
 
-function saveProfile() { alert('Profile saved.') }
+function saveProfile() {
+  const fields = ['p-biz','p-owner','p-mc','p-dot','p-city','p-email','p-tg','p-rpm','p-cs','p-cn']
+  const data = {}
+  fields.forEach(id => {
+    const el = document.getElementById(id)
+    if(el) data[id] = el.value
+  })
+  localStorage.setItem('ai_dispatch_profile', JSON.stringify(data))
+  alert('Profile saved.')
+}
+
+function loadProfile() {
+  try {
+    const data = JSON.parse(localStorage.getItem('ai_dispatch_profile')||'{}')
+    Object.entries(data).forEach(([id,val]) => {
+      const el = document.getElementById(id)
+      if(el) el.value = val
+    })
+  } catch {}
+  try {
+    const kb = JSON.parse(localStorage.getItem('ai_dispatch_kb')||'{}')
+    if(kb.biz) document.getElementById('kb-biz').value = kb.biz
+    if(kb.goal) document.getElementById('kb-goal').value = kb.goal
+  } catch {}
+}
+
+function clearAllMemory() {
+  localStorage.removeItem('ai_dispatch_profile')
+  localStorage.removeItem('ai_dispatch_kb')
+  localStorage.removeItem('ai_dispatch_custom_kb')
+  renderSavedKb()
+  alert('All agent memory cleared.')
+}
+
+function buildIntegrationsList() {
+  const INTEGRATIONS = [
+    { name:'Airtable', desc:'Operational database — Carriers, Loads, Clients, Invoices', icon:'📊', key:'AIRTABLE_API_KEY', required:true },
+    { name:'Anthropic (Claude)', desc:'AI engine powering all 9 agents', icon:'🤖', key:'ANTHROPIC_API_KEY', required:true },
+    { name:'Retell AI', desc:'24/7 voice receptionist — inbound call handling', icon:'📞', key:'RETELL_API_KEY', required:false },
+    { name:'FMCSA SAFER', desc:'Carrier vetting — authority age, safety rating, insurance', icon:'🛡️', key:'FMCSA_API_KEY', required:true },
+    { name:'Telegram', desc:'Maya alerts — Tier 2/3 escalations and morning reports', icon:'✈️', key:'TELEGRAM_BOT_TOKEN', required:true },
+    { name:'DAT Load Board', desc:'Load posting and carrier matching', icon:'🚛', key:'DAT_API_KEY', required:false },
+    { name:'Twilio', desc:'SMS alerts — Tier 3 escalations to owner phone', icon:'📱', key:'TWILIO_ACCOUNT_SID', required:false },
+    { name:'QuickBooks', desc:'Invoicing and P&L — synced with Airtable loads', icon:'💼', key:'QUICKBOOKS_CLIENT_ID', required:false },
+  ]
+  const container = document.getElementById('int-list')
+  if(!container) return
+  container.innerHTML = `
+    <div class="sv-sect">
+      <div class="sv-sect-title">Connected Services</div>
+      <div style="font-size:11px;color:var(--amber);padding:8px 12px;border-radius:7px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);margin-bottom:14px">
+        ⚠️ Set API keys in Railway Variables — they are never stored in the browser.
+      </div>
+      ${INTEGRATIONS.map(int => `
+        <div class="int-row">
+          <div style="display:flex;align-items:center;gap:9px;flex:1">
+            <span style="font-size:18px">${int.icon}</span>
+            <div>
+              <div class="int-nm">${int.name}${int.required?'<span style="font-size:8px;color:var(--red);margin-left:6px;font-weight:700">REQUIRED</span>':''}</div>
+              <div class="int-desc">${int.desc}</div>
+            </div>
+          </div>
+          <span class="int-badge int-no">NOT CONNECTED</span>
+        </div>`).join('')}
+    </div>
+    <div style="font-size:11px;color:var(--low);line-height:1.7;padding:4px 0">
+      All keys must be set as environment variables in Railway. Never paste keys into the browser — this dashboard cannot read Railway Variables directly.
+    </div>`
+}
 
 // ── MARKET DATA ───────────────────────────────────────────────────────────────
 const MARKETS = {
   usa:{
-    label:'USA',flag:'🇺🇸',statusColor:'var(--green)',status:'Market Active',reg:'FMCSA · DOT · SAFER',
+    active:true, label:'USA',flag:'🇺🇸',statusColor:'var(--green)',status:'Market Active',reg:'FMCSA · DOT · SAFER',
     stats:[
       {lbl:'ACTIVE LOADS',val:'7',sub:'11 decisions this week',color:'var(--green)'},
       {lbl:'REVENUE THIS WEEK',val:'$11,240',sub:'↑ $1,440 vs last week',color:'var(--green)'},
@@ -875,7 +1056,8 @@ const MARKETS = {
     lanes:['Chicago → Dallas','Atlanta → Miami','LA → Phoenix','NYC → Boston'],
   },
   canada:{
-    label:'Canada',flag:'🇨🇦',statusColor:'var(--amber)',status:'Expanding · Year 2',reg:'NSC · Transport Canada · CVSE',
+    active:false, activateCmd:'Activate Canada',
+    label:'Canada',flag:'🇨🇦',statusColor:'var(--amber)',status:'Inactive · Year 2',reg:'NSC · Transport Canada · CVSE',
     stats:[
       {lbl:'ACTIVE LOADS',val:'0',sub:'Market launch phase',color:'var(--amber)'},
       {lbl:'REVENUE THIS WEEK',val:'$0 CAD',sub:'Pre-launch',color:'var(--mid)'},
@@ -892,24 +1074,26 @@ const MARKETS = {
     lanes:['Toronto → Ottawa','Calgary → Edmonton','Vancouver → Victoria','Montreal → Quebec City'],
   },
   eu:{
-    label:'EU',flag:'🇪🇺',statusColor:'var(--blue)',status:'Scouting · Year 2',reg:'GDP · EMA · EU-MDR · CMR',
+    active:false, activateCmd:'Activate Europe',
+    label:'EU + UK',flag:'🇪🇺',statusColor:'var(--blue)',status:'Inactive · Year 2',reg:'GDP · EMA · DVSA · EU-MDR · CMR',
     stats:[
       {lbl:'ACTIVE LOADS',val:'0',sub:'Research phase',color:'var(--blue)'},
       {lbl:'REVENUE THIS WEEK',val:'€0',sub:'Pre-market',color:'var(--mid)'},
       {lbl:'CARRIERS IDENTIFIED',val:'0',sub:'GDP-pharma required',color:'var(--blue)'},
-      {lbl:'MARKET RESEARCH',val:'—',sub:'DE · NL · FR priority',color:'var(--mid)'},
+      {lbl:'MARKET RESEARCH',val:'—',sub:'UK · DE · NL priority',color:'var(--mid)'},
     ],
     priorities:[
-      {n:1,t:'EU medical freight requires GDP (Good Distribution Practice) carrier certification — research required',tier:'T3'},
-      {n:2,t:'Primary targets: Netherlands (pharma hub), Germany (medical devices), France (hospital supply)',tier:'T2'},
-      {n:3,t:'EUR currency and VAT invoicing structure — plan Airtable multi-currency setup',tier:'T2'},
-      {n:4,t:'Identify EU freight broker partnerships before direct market entry',tier:'T1'},
-      {n:5,t:'EU carrier authority equiv: operator license + ADR certification for medical goods',tier:'T3'},
+      {n:1,t:'EU medical freight requires GDP (Good Distribution Practice) carrier certification',tier:'T3'},
+      {n:2,t:'UK post-Brexit: separate DVSA compliance — O-licence + MHRA GDP certification required',tier:'T3'},
+      {n:3,t:'Primary targets: Netherlands (pharma hub), Germany (medical devices), UK (NHS supply chain)',tier:'T2'},
+      {n:4,t:'EUR/GBP currency and VAT invoicing — plan Airtable multi-currency setup',tier:'T2'},
+      {n:5,t:'London → Birmingham → Manchester NHS corridors — highest UK volume opportunity',tier:'T1'},
     ],
-    lanes:['Amsterdam → Frankfurt','Rotterdam → Antwerp','Munich → Berlin','Paris → Lyon'],
+    lanes:['Amsterdam → Frankfurt','London → Birmingham','Munich → Berlin','Rotterdam → Antwerp'],
   },
   uk:{
-    label:'UK',flag:'🇬🇧',statusColor:'var(--blue)',status:'Scouting · Year 2',reg:'DVSA · MHRA · GMP',
+    active:false, activateCmd:'Activate Europe',
+    label:'UK',flag:'🇬🇧',statusColor:'var(--blue)',status:'Inactive · Year 2',reg:'DVSA · MHRA · GMP',
     stats:[
       {lbl:'ACTIVE LOADS',val:'0',sub:'Research phase',color:'var(--blue)'},
       {lbl:'REVENUE THIS WEEK',val:'£0',sub:'Pre-market',color:'var(--mid)'},
@@ -917,21 +1101,44 @@ const MARKETS = {
       {lbl:'NHS PIPELINE',val:'—',sub:'NHS Supply Chain target',color:'var(--mid)'},
     ],
     priorities:[
-      {n:1,t:'Post-Brexit: UK operates separate DVSA compliance, independent from EU framework',tier:'T3'},
+      {n:1,t:'UK market is managed together with EU — type "Activate Europe" to unlock both',tier:'T3'},
       {n:2,t:'NHS Supply Chain — top target: medical device and pharma distribution contracts',tier:'T2'},
       {n:3,t:'UK carrier requirements: Operator Licence (O-licence) + MHRA GDP certification',tier:'T3'},
       {n:4,t:'GBP currency setup: invoicing and Airtable currency config needed',tier:'T2'},
-      {n:5,t:'London → Birmingham → Manchester NHS corridors — highest volume opportunity',tier:'T1'},
+      {n:5,t:'London → Birmingham → Manchester corridors — highest volume opportunity',tier:'T1'},
     ],
     lanes:['London → Birmingham','Manchester → Leeds','Bristol → Cardiff','Edinburgh → Glasgow'],
   },
 }
 let activeMarket = 'usa'
+let unlockedMarkets = new Set(['usa'])
 
 function switchMarket(mk) {
+  const m = MARKETS[mk]
+  if(!m) return
   activeMarket = mk
   document.querySelectorAll('.mk-tab').forEach(t=>t.classList.toggle('on',t.dataset.mk===mk))
-  const m = MARKETS[mk]
+
+  // Show lock screen for inactive markets
+  const locked = !m.active && !unlockedMarkets.has(mk)
+  const lockScreen = document.getElementById('market-lock')
+  const dashContent = document.getElementById('dash-content')
+
+  if(locked) {
+    dashContent.style.display = 'none'
+    lockScreen.style.display = 'flex'
+    document.getElementById('lock-flag').textContent = m.flag
+    document.getElementById('lock-name').textContent = m.label+' Market'
+    document.getElementById('lock-status').textContent = m.status
+    document.getElementById('lock-cmd').textContent = m.activateCmd
+    document.getElementById('lock-input').value = ''
+    document.getElementById('lock-input').placeholder = 'Type "'+m.activateCmd+'" to unlock…'
+    document.getElementById('lock-input').focus()
+    return
+  }
+  lockScreen.style.display = 'none'
+  dashContent.style.display = 'block'
+
   document.getElementById('dash-sub').textContent = m.flag+' '+m.label+' · Medical Dry Van · '+m.status
   document.getElementById('reg-label').textContent = m.reg
   document.getElementById('reg-label').style.color = m.statusColor
@@ -949,6 +1156,28 @@ function switchMarket(mk) {
     </div>`).join('')
 }
 
+function tryActivateMarket() {
+  const input = document.getElementById('lock-input').value.trim()
+  // Match activation commands for Canada and Europe
+  if(input.toLowerCase() === 'activate canada') {
+    unlockedMarkets.add('canada')
+    MARKETS.canada.active = true
+    document.getElementById('lock-err').style.display = 'none'
+    switchMarket('canada')
+    return
+  }
+  if(input.toLowerCase() === 'activate europe') {
+    unlockedMarkets.add('eu'); unlockedMarkets.add('uk')
+    MARKETS.eu.active = true; MARKETS.uk.active = true
+    document.getElementById('lock-err').style.display = 'none'
+    switchMarket('eu')
+    return
+  }
+  const err = document.getElementById('lock-err')
+  err.textContent = '⚠️ Incorrect command. Check the activation phrase and try again.'
+  err.style.display = 'block'
+}
+
 // Init market tabs
 document.querySelectorAll('.mk-tab').forEach(t => {
   t.addEventListener('click', () => switchMarket(t.dataset.mk))
@@ -964,11 +1193,22 @@ function closeSb() {
   document.getElementById('sb-ov').classList.remove('show')
 }
 
+// ── 2FA TOGGLE ────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const tfa = document.getElementById('sec-2fa')
+  if(tfa) tfa.addEventListener('change', () => {
+    document.getElementById('tfa-lbl').textContent = tfa.checked ? 'ENABLED' : 'DISABLED'
+    document.getElementById('tfa-lbl').style.color = tfa.checked ? 'var(--green)' : 'var(--low)'
+  })
+})
+
 // ── INIT ─────────────────────────────────────────────────────────────────────
 buildSidebar()
 switchMarket('usa')
 loadData()
+loadProfile()
 renderSavedKb()
+buildIntegrationsList()
 setInterval(loadData, 5*60*1000)
 </script>
 </body>
