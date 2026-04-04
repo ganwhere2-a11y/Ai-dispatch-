@@ -252,9 +252,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
       <span>⚙️</span><span>Settings</span>
       <span style="margin-left:auto;width:6px;height:6px;background:var(--blue);border-radius:50%"></span>
     </div>
-    <div class="sb-nav-item" style="opacity:.4;cursor:default">
+    <div class="sb-nav-item" id="nav-workflows" onclick="showPg('workflows')">
       <span>🔗</span><span>Workflows</span>
-      <span style="margin-left:6px;font-size:9px;background:var(--blueDim);color:var(--blue);padding:1px 5px;border-radius:4px">Beta</span>
+      <span style="margin-left:6px;font-size:9px;background:var(--greenDim);color:var(--green);padding:1px 5px;border-radius:4px">7 Active</span>
     </div>
   </div>
   <div class="sb-footer">
@@ -454,10 +454,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
             </div>
           </div>
           <div id="kbt-file" style="display:none">
-            <div style="border:2px dashed var(--border);border-radius:8px;padding:28px;text-align:center;color:var(--low);font-size:12px">
-              <div style="font-size:24px;margin-bottom:8px">📁</div>
-              Drop file here or click to browse<br>
-              <span style="font-size:10px">PDF, DOCX, TXT — max 5MB · 10,000 characters</span>
+            <div id="file-drop-zone" style="border:2px dashed var(--border);border-radius:8px;padding:32px;text-align:center;color:var(--low);font-size:12px;cursor:pointer;transition:border-color .15s">
+              <div style="font-size:28px;margin-bottom:10px">📁</div>
+              <div style="font-weight:500;color:var(--mid);margin-bottom:4px">Drop file here or click to browse</div>
+              <span style="font-size:10px">.txt · .md · .csv · .pdf · .docx — max 5MB</span>
+              <input id="file-input" type="file" accept=".txt,.md,.csv,.pdf,.docx" style="display:none">
+            </div>
+            <div id="file-status" style="font-size:12px;color:var(--mid);margin-top:8px;min-height:18px"></div>
+            <div style="font-size:11px;color:var(--low);margin-top:6px;line-height:1.6">
+              Text files (.txt, .md, .csv) are read automatically. PDF/DOCX files are logged — copy-paste the text content using the "Type text" tab for full extraction.
             </div>
           </div>
         </div>
@@ -552,6 +557,22 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
       </div>
     </div>
   </div>
+
+  <!-- WORKFLOWS PAGE -->
+  <div id="pg-workflows" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+    <div class="sv-hd">
+      <div class="sv-back" onclick="showPg('dash')">← Back</div>
+      <div class="sv-title">🔗 Workflows</div>
+      <div style="margin-left:auto;font-size:11px;color:var(--low)">7 automated pipelines</div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:20px 24px">
+      <div style="font-size:12px;color:var(--low);margin-bottom:18px;max-width:780px">
+        These workflows run automatically on schedule. You can also trigger them manually — Maya will send you a Telegram update when each one completes.
+      </div>
+      <div id="wf-grid" style="display:flex;flex-direction:column;gap:10px;max-width:780px"></div>
+      <div style="height:20px"></div>
+    </div>
+  </div>
 </div>
 <script>
 // ── AGENT DATA ────────────────────────────────────────────────────────────────
@@ -589,13 +610,13 @@ const DEPTS = [
   ]},
   { id:'Growth', agents:[
     { name:'Sales', icon:'📈', role:'Lead Gen', color:'#3B82F6',
-      about:'Scrapes FMCSA for qualified dry van carriers with 180+ day authority. Builds outreach sequences and fills the pipeline with direct freight accounts.',
-      actions:['Scrape FMCSA leads','Write cold email','Build lane pitch','Follow up a lead'],
-      skills:['FMCSA API scraping','Lead qualification','4-email sequences','Pipeline management','Follow-up automation'],
+      about:'Multi-channel lead gen: scrapes FMCSA for dry van carriers, pulls LinkedIn prospect data, and runs 4-touch outreach sequences. Fills the pipeline with direct freight accounts and new carriers.',
+      actions:['Scrape FMCSA leads','Pull LinkedIn prospects','Write cold email','Build lane pitch'],
+      skills:['FMCSA API scraping','LinkedIn lead pull','Lead qualification','4-email sequences','Pipeline management','Cold outreach automation'],
       caps:[
-        {name:'Cold Email Sequence',desc:'3-touch outreach to carriers and shippers with capacity and lane data'},
+        {name:'LinkedIn Prospect Report',desc:'Pull dry van carriers, freight brokers, and shippers from LinkedIn by region and company size'},
+        {name:'Cold Email Sequence',desc:'4-touch outreach to carriers and shippers with capacity and lane data'},
         {name:'Lane Pitch One-Pager',desc:'Proposal: your rates, transit time, compliance record, carrier profile'},
-        {name:'Follow-Up Script',desc:'Call/text scripts for warm leads based on previous contact history'},
       ]},
     { name:'Onboarding', icon:'🎯', role:'Trial Funnel', color:'#F5A623',
       about:'Manages the 7-day free trial funnel. Sends carrier packets, runs daily check-ins on days 1/3/5/7, and handles conversion from trial to paid at $350/month.',
@@ -626,14 +647,14 @@ const DEPTS = [
         {name:'Retention Outreach',desc:'Proactive check-ins for at-risk carriers or shippers showing disengagement'},
         {name:'Account Health Report',desc:'Score each account by activity, load frequency, complaint history, churn risk'},
       ]},
-    { name:'Marketer', icon:'📣', role:'Content', color:'#F5A623',
-      about:'Creates content that positions your dispatch service as the go-to for dry van freight. LinkedIn posts, case studies, email newsletters, and authority-building content.',
-      actions:['Write LinkedIn post','Create case study','Email newsletter','Content calendar'],
-      skills:['LinkedIn content','Case studies','Email marketing','Content calendar','Hook writing','Freight authority positioning'],
+    { name:'Marketer', icon:'📣', role:'Content + Ads', color:'#F5A623',
+      about:'Runs your content engine and paid ads. LinkedIn posts, Meta Ad copy, case studies, email newsletters, and TikTok/YouTube scripts. Positions your dispatch service as the authority in dry van medical freight.',
+      actions:['Write LinkedIn post','Create Meta Ad copy','Build content calendar','Write TikTok script'],
+      skills:['LinkedIn content','Meta Ads copy','Case studies','Email marketing','Content calendar','TikTok/YouTube scripts','Freight authority positioning'],
       caps:[
+        {name:'Meta Ad Campaign',desc:'Facebook/Instagram ad copy + targeting brief for carrier and shipper recruitment campaigns'},
         {name:'LinkedIn Post',desc:'Authority-building posts targeting carriers and shippers in dry van freight'},
-        {name:'Case Study',desc:'Client success story formatted for outreach and sales collateral'},
-        {name:'Email Newsletter',desc:'Monthly newsletter for carrier and shipper list with industry insights'},
+        {name:'Content Calendar',desc:'30-day content plan across LinkedIn, Meta, email, and short-form video'},
       ]},
     { name:'CEO Shadow', icon:'👁️', role:'Observer', color:'#7A96AC',
       about:'Watches everything. Monitors all agent activity, surfaces patterns, flags inefficiencies, and gives you an honest view of what\'s working in your operation.',
@@ -686,17 +707,21 @@ function filterAgents(q) {
 
 // ── PAGE SWITCHING ─────────────────────────────────────────────────────────────
 function showPg(id) {
-  ['dash','agent','settings'].forEach(p => {
+  ['dash','agent','settings','workflows'].forEach(p => {
     const el = document.getElementById('pg-'+p)
-    el.style.display = p===id ? (p==='agent'?'':'block') : 'none'
+    if(!el) return
+    el.style.display = p===id ? (p==='agent'?'block':'flex') : 'none'
+    if(p==='dash'&&id==='dash') el.style.display='block'
     if(p==='agent') el.style.display = id==='agent'?'block':'none'
   })
   document.getElementById('nav-dash').classList.toggle('on', id==='dash')
   document.getElementById('nav-settings').classList.toggle('on', id==='settings')
+  document.getElementById('nav-workflows').classList.toggle('on', id==='workflows')
   document.querySelectorAll('.ag-row').forEach(r=>r.classList.remove('on'))
   if(id!=='agent') currentAgent = null
-  const titles = {dash:'Dashboard',settings:'Settings'}
+  const titles = {dash:'Dashboard',settings:'Settings',workflows:'Workflows'}
   document.getElementById('tb-title').textContent = titles[id]||''
+  if(id==='workflows') loadWorkflows()
   if(window.innerWidth<=768) closeSb()
 }
 
@@ -1001,39 +1026,179 @@ function clearAllMemory() {
 }
 
 function buildIntegrationsList() {
-  const INTEGRATIONS = [
-    { name:'Airtable', desc:'Operational database — Carriers, Loads, Clients, Invoices', icon:'📊', key:'AIRTABLE_API_KEY', required:true },
-    { name:'Anthropic (Claude)', desc:'AI engine powering all 9 agents', icon:'🤖', key:'ANTHROPIC_API_KEY', required:true },
-    { name:'Retell AI', desc:'24/7 voice receptionist — inbound call handling', icon:'📞', key:'RETELL_API_KEY', required:false },
-    { name:'FMCSA SAFER', desc:'Carrier vetting — authority age, safety rating, insurance', icon:'🛡️', key:'FMCSA_API_KEY', required:true },
-    { name:'Telegram', desc:'Maya alerts — Tier 2/3 escalations and morning reports', icon:'✈️', key:'TELEGRAM_BOT_TOKEN', required:true },
-    { name:'DAT Load Board', desc:'Load posting and carrier matching', icon:'🚛', key:'DAT_API_KEY', required:false },
-    { name:'Twilio', desc:'SMS alerts — Tier 3 escalations to owner phone', icon:'📱', key:'TWILIO_ACCOUNT_SID', required:false },
-    { name:'QuickBooks', desc:'Invoicing and P&L — synced with Airtable loads', icon:'💼', key:'QUICKBOOKS_CLIENT_ID', required:false },
+  const GROUPS = [
+    { label:'Core — Required', color:'var(--red)', items:[
+      { name:'Anthropic (Claude)', desc:'AI engine powering all 9 agents', icon:'🤖', key:'ANTHROPIC_API_KEY', status:'check' },
+      { name:'Airtable', desc:'Operational database — Carriers, Loads, Clients, Invoices', icon:'📊', key:'AIRTABLE_API_KEY', status:'check' },
+      { name:'Telegram', desc:'Maya alerts — Tier 2/3 escalations and morning reports', icon:'✈️', key:'TELEGRAM_BOT_TOKEN', status:'check' },
+      { name:'FMCSA SAFER', desc:'Carrier vetting — authority age, safety rating, insurance', icon:'🛡️', key:'FMCSA_API_KEY', status:'check' },
+    ]},
+    { label:'Sales & Growth', color:'var(--blue)', items:[
+      { name:'LinkedIn', desc:'Pull carrier and shipper prospects by region — Sales agent lead source', icon:'💼', key:'LINKEDIN_ACCESS_TOKEN', status:'oauth', setupUrl:'https://www.linkedin.com/developers/apps', badge:'SALES' },
+      { name:'DAT Load Board', desc:'Load posting, spot rate data, and carrier matching', icon:'🚛', key:'DAT_API_KEY', status:'pending', setupUrl:'https://www.dat.com/solutions/apis' },
+      { name:'123LoadBoard', desc:'Load board posting and lane rate lookup for carrier matching', icon:'📋', key:'LOAD123_API_KEY', status:'pending', setupUrl:'https://www.123loadboard.com/api' },
+    ]},
+    { label:'Marketing & Ads', color:'var(--amber)', items:[
+      { name:'Meta Ads (Facebook/Instagram)', desc:'Run carrier recruitment and shipper acquisition campaigns — Marketer agent', icon:'📣', key:'META_ACCESS_TOKEN', status:'oauth', setupUrl:'https://developers.facebook.com/docs/marketing-apis/', badge:'MARKETER' },
+    ]},
+    { label:'Operations', color:'var(--green)', items:[
+      { name:'Retell AI', desc:'24/7 voice receptionist — inbound call handling and routing', icon:'📞', key:'RETELL_API_KEY', status:'pending' },
+      { name:'Twilio', desc:'SMS alerts — Tier 3 escalations to owner phone', icon:'📱', key:'TWILIO_ACCOUNT_SID', status:'pending' },
+      { name:'Wave (Accounting)', desc:'Invoicing, P&L, and expense tracking — synced with Airtable loads', icon:'📒', key:'WAVE_API_TOKEN', status:'pending', setupUrl:'https://developer.waveapps.com/' },
+    ]},
   ]
   const container = document.getElementById('int-list')
   if(!container) return
   container.innerHTML = `
-    <div class="sv-sect">
-      <div class="sv-sect-title">Connected Services</div>
-      <div style="font-size:11px;color:var(--amber);padding:8px 12px;border-radius:7px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);margin-bottom:14px">
-        ⚠️ Set API keys in Railway Variables — they are never stored in the browser.
-      </div>
-      ${INTEGRATIONS.map(int => `
-        <div class="int-row">
-          <div style="display:flex;align-items:center;gap:9px;flex:1">
-            <span style="font-size:18px">${int.icon}</span>
-            <div>
-              <div class="int-nm">${int.name}${int.required?'<span style="font-size:8px;color:var(--red);margin-left:6px;font-weight:700">REQUIRED</span>':''}</div>
-              <div class="int-desc">${int.desc}</div>
+    <div style="font-size:11px;color:var(--amber);padding:8px 12px;border-radius:7px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);margin-bottom:14px">
+      ⚠️ API keys go in Railway Variables — never paste them here. Click "Set Up" links to get credentials.
+    </div>` +
+    GROUPS.map(g => `
+    <div class="sv-sect" style="margin-bottom:12px">
+      <div class="sv-sect-title" style="color:${g.color};font-size:10px;letter-spacing:.8px">${g.label.toUpperCase()}</div>
+      ${g.items.map(int => `
+        <div class="int-row" style="gap:12px">
+          <span style="font-size:20px">${int.icon}</span>
+          <div style="flex:1;min-width:0">
+            <div class="int-nm" style="display:flex;align-items:center;gap:6px">
+              ${int.name}
+              ${int.badge?`<span style="font-size:8px;background:var(--blueDim);color:var(--blue);padding:1px 5px;border-radius:4px;font-weight:700">${int.badge}</span>`:''}
             </div>
+            <div class="int-desc">${int.desc}</div>
+            <div style="font-size:10px;color:var(--low);margin-top:2px;font-family:monospace">${int.key}</div>
           </div>
-          <span class="int-badge int-no">NOT CONNECTED</span>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+            <span class="int-badge int-no">${int.status==='oauth'?'OAUTH':'NOT SET'}</span>
+            ${int.setupUrl?`<a href="${int.setupUrl}" target="_blank" style="font-size:10px;color:var(--blue);text-decoration:none">Set Up ↗</a>`:''}
+          </div>
         </div>`).join('')}
-    </div>
-    <div style="font-size:11px;color:var(--low);line-height:1.7;padding:4px 0">
-      All keys must be set as environment variables in Railway. Never paste keys into the browser — this dashboard cannot read Railway Variables directly.
+    </div>`).join('') +
+    `<div style="font-size:11px;color:var(--low);line-height:1.8;padding:4px 0">
+      Set all keys as environment variables in your Railway project → Variables tab. Redeploy after adding keys.
     </div>`
+}
+
+// ── WORKFLOWS ─────────────────────────────────────────────────────────────────
+async function loadWorkflows() {
+  try {
+    const r = await fetch('/api/workflows')
+    const wfs = await r.json()
+    document.getElementById('wf-grid').innerHTML = wfs.map(w=>`
+      <div style="background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:18px 20px;display:flex;align-items:center;gap:16px">
+        <div style="font-size:30px;width:44px;text-align:center;flex-shrink:0">${w.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600;margin-bottom:3px">${w.name}</div>
+          <div style="font-size:12px;color:var(--mid);margin-bottom:5px">${w.desc}</div>
+          <div style="font-size:10px;color:var(--low);display:flex;align-items:center;gap:5px">
+            <span>📅</span><span>${w.schedule}</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+          <button id="wf-btn-${w.id}" onclick="runWorkflow('${w.id}',this)" style="padding:8px 18px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">▶ Run Now</button>
+          <div id="wf-msg-${w.id}" style="font-size:10px;color:var(--green);display:none;text-align:right;max-width:160px"></div>
+        </div>
+      </div>`).join('')
+  } catch(e) { document.getElementById('wf-grid').innerHTML = '<div style="color:var(--low);font-size:13px">Unable to load workflows.</div>' }
+}
+
+async function runWorkflow(id, btn) {
+  btn.textContent = 'Starting…'; btn.disabled = true; btn.style.background = 'var(--surfHi)'
+  const msgEl = document.getElementById('wf-msg-'+id)
+  try {
+    const r = await fetch('/api/workflow/run', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id}) })
+    const d = await r.json()
+    btn.textContent = '✓ Started'
+    btn.style.background = 'var(--green)'
+    if(msgEl) { msgEl.textContent = d.msg; msgEl.style.display='block' }
+    setTimeout(()=>{ btn.textContent='▶ Run Now'; btn.disabled=false; btn.style.background='var(--blue)'; if(msgEl) msgEl.style.display='none' }, 4000)
+  } catch {
+    btn.textContent = '⚠️ Error'; btn.style.background = 'var(--red)'
+    setTimeout(()=>{ btn.textContent='▶ Run Now'; btn.disabled=false; btn.style.background='var(--blue)' }, 3000)
+  }
+}
+
+// ── FILE UPLOAD (Knowledge → Upload file) ─────────────────────────────────────
+function initFileUpload() {
+  const zone = document.getElementById('file-drop-zone')
+  const input = document.getElementById('file-input')
+  if(!zone || !input) return
+
+  zone.addEventListener('click', ()=>input.click())
+  zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.style.borderColor='var(--blue)' })
+  zone.addEventListener('dragleave', ()=>{ zone.style.borderColor='var(--border)' })
+  zone.addEventListener('drop', e=>{ e.preventDefault(); zone.style.borderColor='var(--border)'; handleFiles(e.dataTransfer.files) })
+  input.addEventListener('change', ()=>handleFiles(input.files))
+}
+
+function handleFiles(files) {
+  const file = files[0]
+  if(!file) return
+  const status = document.getElementById('file-status')
+  const maxSize = 5 * 1024 * 1024
+  if(file.size > maxSize) { status.textContent = '⚠️ File too large — max 5MB'; status.style.color='var(--red)'; return }
+
+  const ext = file.name.split('.').pop().toLowerCase()
+  const textTypes = ['txt','md','csv','json']
+
+  if(!textTypes.includes(ext) && ext !== 'pdf' && ext !== 'docx') {
+    status.textContent = '⚠️ Supported: .txt .md .csv .pdf .docx'; status.style.color='var(--red)'; return
+  }
+
+  status.textContent = 'Reading '+file.name+'…'; status.style.color='var(--mid)'
+
+  if(textTypes.includes(ext)) {
+    const reader = new FileReader()
+    reader.onload = async e => {
+      const content = e.target.result.slice(0, 10000)
+      await uploadSop({ title: file.name.replace(/\.[^.]+$/,''), scope:'All agents (global)', content, filename: file.name, type: ext })
+      status.textContent = '✓ '+file.name+' saved to knowledge base'; status.style.color='var(--green)'
+    }
+    reader.readAsText(file)
+  } else {
+    // PDF/DOCX: store name + note, user needs text extraction
+    uploadSop({ title: file.name.replace(/\.[^.]+$/,''), scope:'All agents (global)', content:'[Binary file — '+file.name+'. To use this SOP: copy and paste the text content into the "Type text" tab.]', filename: file.name, type: ext }).then(()=>{
+      status.textContent = '📋 '+file.name+' logged. Paste text in the "Type text" tab for full content.'; status.style.color='var(--amber)'
+    })
+  }
+}
+
+async function uploadSop({ title, scope, content, filename, type }) {
+  // Save to server
+  try {
+    await fetch('/api/sop/save', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ title, scope, content, filename, type }) })
+  } catch {}
+  // Also save to localStorage as backup
+  const entries = JSON.parse(localStorage.getItem('ai_dispatch_custom_kb')||'[]')
+  entries.unshift({ title, scope, body: content, saved: new Date().toISOString(), source:'file', filename })
+  localStorage.setItem('ai_dispatch_custom_kb', JSON.stringify(entries))
+  renderSavedKb()
+  await loadServerSops()
+}
+
+async function loadServerSops() {
+  try {
+    const r = await fetch('/api/sops')
+    const sops = await r.json()
+    const s = document.getElementById('kb-saved-sect')
+    const container = document.getElementById('kb-saved')
+    if(!s || !container) return
+    if(sops.length===0 && JSON.parse(localStorage.getItem('ai_dispatch_custom_kb')||'[]').length===0) { s.style.display='none'; return }
+    s.style.display=''
+    const serverHtml = sops.map(sop=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <div>
+          <div style="font-weight:500">📄 ${sop.title||sop.filename}</div>
+          <div style="font-size:10px;color:var(--low)">${sop.scope} · ${new Date(sop.saved).toLocaleDateString()} · Saved to server · injected into all agents</div>
+        </div>
+        <button onclick="deleteSop('${sop.id}')" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;padding:2px 6px">Delete</button>
+      </div>`).join('')
+    container.innerHTML = serverHtml
+  } catch {}
+}
+
+async function deleteSop(id) {
+  await fetch('/api/sop/'+id, { method:'DELETE' })
+  await loadServerSops()
 }
 
 // ── MARKET DATA ───────────────────────────────────────────────────────────────
@@ -1209,6 +1374,8 @@ loadData()
 loadProfile()
 renderSavedKb()
 buildIntegrationsList()
+loadServerSops()
+initFileUpload()
 setInterval(loadData, 5*60*1000)
 </script>
 </body>

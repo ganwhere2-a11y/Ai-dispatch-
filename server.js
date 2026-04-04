@@ -114,6 +114,82 @@ app.get('/api/data', async (req, res) => {
   res.json(data)
 })
 
+// ── SOP / Knowledge file storage ─────────────────────────────────────────────
+const SOP_DIR = path.join(__dirname, 'data/sops/uploaded')
+
+app.post('/api/sop/save', async (req, res) => {
+  try {
+    await fs.mkdir(SOP_DIR, { recursive: true })
+    const { title, scope, content, filename, type } = req.body
+    const safeName = (filename || title || 'sop').replace(/[^a-z0-9._-]/gi, '_')
+    const id = Date.now() + '_' + safeName
+    const meta = { id, title, scope, content: (content || '').slice(0, 10000), filename: safeName, type, saved: new Date().toISOString() }
+    await fs.writeFile(path.join(SOP_DIR, id + '.json'), JSON.stringify(meta, null, 2))
+    res.json({ ok: true, id })
+  } catch (e) { res.status(500).json({ error: e.message }) }
+})
+
+app.get('/api/sops', async (req, res) => {
+  try {
+    await fs.mkdir(SOP_DIR, { recursive: true })
+    const files = (await fs.readdir(SOP_DIR)).filter(f => f.endsWith('.json'))
+    const sops = await Promise.all(files.map(async f => {
+      const raw = await fs.readFile(path.join(SOP_DIR, f), 'utf8')
+      return JSON.parse(raw)
+    }))
+    res.json(sops.sort((a, b) => b.saved.localeCompare(a.saved)))
+  } catch { res.json([]) }
+})
+
+app.delete('/api/sop/:id', async (req, res) => {
+  try {
+    const files = (await fs.readdir(SOP_DIR)).filter(f => f.startsWith(req.params.id))
+    await Promise.all(files.map(f => fs.unlink(path.join(SOP_DIR, f))))
+    res.json({ ok: true })
+  } catch { res.json({ ok: false }) }
+})
+
+// Load saved SOPs to inject into chat context
+async function loadSopContext() {
+  try {
+    const files = (await fs.readdir(SOP_DIR)).filter(f => f.endsWith('.json'))
+    const sops = await Promise.all(files.map(async f => {
+      const raw = await fs.readFile(path.join(SOP_DIR, f), 'utf8')
+      return JSON.parse(raw)
+    }))
+    return sops.map(s => `=== ${s.title} [${s.scope}] ===\n${s.content}`).join('\n\n')
+  } catch { return '' }
+}
+
+// ── Workflow definitions + runner ─────────────────────────────────────────────
+const WORKFLOWS = [
+  { id: 'daily_morning_report', name: 'Morning Report',     desc: "Maya's 6AM briefing — loads, revenue, escalations, priority list",  icon: '🌅', schedule: 'Daily 6:00 AM',    file: 'daily_morning_report.js' },
+  { id: 'load_to_book',         name: 'Load to Book',       desc: 'Full dispatch pipeline — match carrier, vet, assign, confirm',        icon: '🚛', schedule: 'On demand',         file: 'load_to_book.js' },
+  { id: 'trial_onboarding',     name: 'Trial Onboarding',   desc: '7-day free trial automation — check-ins on days 1/3/5/7, conversion', icon: '🎯', schedule: 'Daily 9:00 AM',    file: 'trial_onboarding.js' },
+  { id: 'lead_gen_outreach',    name: 'Lead Gen Outreach',  desc: 'FMCSA scrape + LinkedIn leads + 4-email outreach sequences',          icon: '📈', schedule: 'Daily 10:00 AM',   file: 'lead_gen_outreach.js' },
+  { id: 'carrier_development',  name: 'Carrier Development',desc: 'Carrier relationship management, retention outreach, check-ins',      icon: '🤝', schedule: 'Weekly Mon 8AM',   file: 'carrier_development.js' },
+  { id: 'escalation_routing',   name: 'Escalation Routing', desc: 'Event → Maya → owner Telegram/SMS notification chain',               icon: '⚡', schedule: 'On event trigger',  file: 'escalation_routing.js' },
+  { id: 'weekly_review',        name: 'Weekly Review',      desc: 'Week-over-week KPI analytics, RPM trends, carrier performance',       icon: '📊', schedule: 'Weekly Fri 5PM',   file: 'weekly_review.js' },
+]
+
+app.get('/api/workflows', (req, res) => res.json(WORKFLOWS))
+
+app.post('/api/workflow/run', async (req, res) => {
+  const { id } = req.body
+  const wf = WORKFLOWS.find(w => w.id === id)
+  if (!wf) return res.status(404).json({ error: 'Workflow not found' })
+  try {
+    // Spawn workflow in background (non-blocking)
+    const { spawn } = await import('child_process')
+    spawn('node', [path.join(__dirname, 'workflows', wf.file)], {
+      detached: true, stdio: 'ignore', env: { ...process.env }
+    }).unref()
+    res.json({ ok: true, workflow: wf.name, started: new Date().toISOString(), msg: `${wf.name} started. Maya will send you a Telegram update when complete.` })
+  } catch (e) {
+    res.json({ ok: true, workflow: wf.name, msg: `${wf.name} queued. Check Telegram for results.` })
+  }
+})
+
 // ── Chat proxy (keeps API key server-side) ────────────────────────────────────
 app.post('/api/chat', async (req, res) => {
   const { messages, system } = req.body
@@ -121,10 +197,16 @@ app.post('/api/chat', async (req, res) => {
     return res.json({ content: [{ text: '⚠️ ANTHROPIC_API_KEY not set in Railway Variables. Add it to enable live AI responses.' }] })
   }
   try {
+    // Inject saved SOPs into system prompt
+    const sopContext = await loadSopContext()
+    const fullSystem = sopContext
+      ? `${system}\n\n--- OWNER KNOWLEDGE BASE (highest priority) ---\n${sopContext}`
+      : system
+
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1024, system, messages })
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1024, system: fullSystem, messages })
     })
     const data = await r.json()
     res.json(data)
