@@ -114,13 +114,22 @@ THIS SESSION — PICK ONE AND DO IT:
   [ ] Write 1 missing SOP → agents get smarter
   [ ] Book 1 direct shipper meeting → bypass brokers, keep the margin
 
-WHAT'S MISSING FROM YOUR SOPs RIGHT NOW:
-  ❌ Carrier Agreement (legal contract — you need this before any carrier moves freight)
-  ❌ Invoice & Collections (who chases slow brokers? no one, currently)
-  ❌ Carrier Retention 30/60/90 day playbook (losing a carrier = $4,200/year gone)
-  ❌ Rate Negotiation scripts (how Erin pushes from $2.51 → $2.85+)
-  ❌ Direct Shipper outreach (brokers take 15-25% — direct contracts = you keep it)
-  ❌ Weekly P&L tracking (are you profitable? no agent is checking)
+SOP LIBRARY STATUS:
+  ✅ Carrier Agreement SOP — erin_maya_carrier_agreement_sop.md
+  ✅ Erin DAT Master SOP — erin_dat_master_sop.md (full load lifecycle)
+  ✅ Broker Checklist — broker_checklist.md
+  ✅ Carrier Onboarding Flow — carrier_onboarding_flow.md
+  ✅ Anti-Hallucination Rules — anti_hallucination_rules.md
+  ✅ Security & Guardrails — security_guardrails.md
+  ✅ Winback Email Sequence — templates/winback_emails.md
+  ✅ Testimonial & Nurture — templates/testimonial_nurture_emails.md
+  ✅ Drug Test / NDS Clearinghouse — in onboarding system_prompt.md
+  ✅ Dispute Resolution 7-step — in support system_prompt.md
+
+STILL NEEDED — REAL SCRIPTS (not templates):
+  ⚠️  Your actual Sales outreach scripts (you haven't sent these yet)
+  ⚠️  DAT SOP from your physical binder (waiting on you)
+  ⚠️  Drug testing enrollment sheet from National Testing Consortium
 
 THE GAP BETWEEN YOU AND $1M:
   You have the system. You have the agents. You have the SOPs.

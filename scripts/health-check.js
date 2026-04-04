@@ -182,7 +182,7 @@ async function main() {
     ['Min RPM priority', process.env.MIN_RPM_PRIORITY || '3.00', '$/mile'],
     ['Max deadhead', process.env.MAX_DEADHEAD_MILES || '50', 'miles'],
     ['Max weight', process.env.MAX_LOAD_WEIGHT || '48000', 'lbs'],
-    ['Authority min age', process.env.AUTHORITY_MIN_AGE_DAYS || '180', 'days'],
+    ['Authority min age', process.env.AUTHORITY_MIN_AGE_DAYS || '30', 'days'],
     ['Escalation threshold', process.env.QUOTE_ESCALATION_THRESHOLD || '5000', '$'],
     ['Commission (existing)', ((parseFloat(process.env.COMMISSION_RATE_EXISTING) || 0.08) * 100).toFixed(0), '%'],
     ['Commission (new)', ((parseFloat(process.env.COMMISSION_RATE_NEW) || 0.10) * 100).toFixed(0), '%']
