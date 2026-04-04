@@ -107,6 +107,337 @@
         "importance": 2,
         "recall_count": 0,
         "last_recalled": null
+      },
+      {
+        "id": "mem_Shadow_synthetic_0",
+        "timestamp": "2026-03-23T06:15:44.762Z",
+        "key": "owner_pattern",
+        "value": "Owner approves all Iron Rule rejections without modification. 11/11 decisions confirmed. Confidence: 99%.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 8,
+        "last_recalled": "2026-04-03T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Shadow_synthetic_1",
+        "timestamp": "2026-03-26T06:15:44.762Z",
+        "key": "owner_pattern",
+        "value": "Owner responds to Tier-3 escalations in under 15 minutes during business hours. After hours: 45min average.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 8,
+        "last_recalled": "2026-03-31T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Shadow_synthetic_2",
+        "timestamp": "2026-03-29T06:15:44.762Z",
+        "key": "owner_pattern",
+        "value": "Owner never books negative-profit loads regardless of relationship. 0 exceptions observed.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 5,
+        "last_recalled": "2026-03-31T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Shadow_synthetic_3",
+        "timestamp": "2026-04-01T06:15:44.762Z",
+        "key": "phase_status",
+        "value": "Phase 1 (observe only). 23 decisions logged. Approaching Phase 2 threshold at 90 decisions.",
+        "source": "seed-training-data",
+        "importance": 3,
+        "recall_count": 8,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      }
+    ],
+    "Erin": [
+      {
+        "id": "mem_Erin_synthetic_0",
+        "timestamp": "2026-03-17T06:15:44.762Z",
+        "key": "profitable_lane",
+        "value": "Chicago→Nashville at $2.75+/mi with <40mi deadhead. Consistent broker relationship. Book on sight.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 5,
+        "last_recalled": "2026-04-03T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Erin_synthetic_1",
+        "timestamp": "2026-03-20T06:15:44.762Z",
+        "key": "profitable_lane",
+        "value": "Dallas→Memphis at $3.00+/mi. Priority lane. Broker books us repeat.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 7,
+        "last_recalled": "2026-04-03T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Erin_synthetic_2",
+        "timestamp": "2026-03-23T06:15:44.762Z",
+        "key": "iron_rule_pattern",
+        "value": "Florida loads always rejected at Rule 1. Do not calculate profit or check carrier — reject immediately.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 4,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Erin_synthetic_3",
+        "timestamp": "2026-03-26T06:15:44.762Z",
+        "key": "carrier_pattern",
+        "value": "Carriers with <180-day authority are flagged for re-check at exact 180-day mark. Log date.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 1,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Erin_synthetic_4",
+        "timestamp": "2026-03-29T06:15:44.762Z",
+        "key": "negotiation_pattern",
+        "value": "Brokers posting $2.48-$2.55 rarely come up to $2.75. Walk away rather than waste time.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 7,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Erin_synthetic_5",
+        "timestamp": "2026-04-01T06:15:44.762Z",
+        "key": "dispatch_pattern",
+        "value": "Two loads, one carrier: always assign carrier to highest-profit load first. Search for second carrier simultaneously.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 6,
+        "last_recalled": "2026-04-02T06:15:44.762Z",
+        "synthetic": true
+      }
+    ],
+    "Maya": [
+      {
+        "id": "mem_Maya_synthetic_0",
+        "timestamp": "2026-03-23T06:15:44.762Z",
+        "key": "escalation_pattern",
+        "value": "Owner approves Tier-2 load-value escalations within 5 minutes when data package is complete (load ID, route, profit, carrier).",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 4,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Maya_synthetic_1",
+        "timestamp": "2026-03-26T06:15:44.762Z",
+        "key": "escalation_pattern",
+        "value": "Attorney/legal contacts are always Tier-3. Owner responds within 15 minutes on average.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 5,
+        "last_recalled": "2026-04-01T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Maya_synthetic_2",
+        "timestamp": "2026-03-29T06:15:44.762Z",
+        "key": "reporting_pattern",
+        "value": "Owner reads morning report between 6:05-6:20 AM. High-priority items should be first, not buried.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 1,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Maya_synthetic_3",
+        "timestamp": "2026-04-01T06:15:44.762Z",
+        "key": "owner_preference",
+        "value": "Owner prefers Telegram over SMS for Tier-2. Uses SMS only for Tier-3.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 7,
+        "last_recalled": "2026-04-02T06:15:44.762Z",
+        "synthetic": true
+      }
+    ],
+    "Compliance": [
+      {
+        "id": "mem_Compliance_synthetic_0",
+        "timestamp": "2026-03-23T06:15:44.762Z",
+        "key": "vetting_pattern",
+        "value": "Carriers with SMS Unsafe Driving scores in Alert category — always escalate to Maya even if safety rating is Unrated.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 3,
+        "last_recalled": "2026-04-02T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Compliance_synthetic_1",
+        "timestamp": "2026-03-26T06:15:44.762Z",
+        "key": "vetting_pattern",
+        "value": "Authority briefly revoked and reinstated within 90 days = Tier-2 flag. Do not auto-approve even if currently Active.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 2,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Compliance_synthetic_2",
+        "timestamp": "2026-03-29T06:15:44.762Z",
+        "key": "insurance_pattern",
+        "value": "7-day insurance warning always prompts carrier renewal. 6/6 carriers renewed before expiry when notified.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 8,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Compliance_synthetic_3",
+        "timestamp": "2026-04-01T06:15:44.762Z",
+        "key": "compliance_pattern",
+        "value": "FMCSA SAFER system outages: always return HOLD to Erin. Never approve on last known status.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 8,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      }
+    ],
+    "Sales": [
+      {
+        "id": "mem_Sales_synthetic_0",
+        "timestamp": "2026-03-20T06:15:44.762Z",
+        "key": "conversion_pattern",
+        "value": "Email 2 positive replies (\"tell me more\") have 70%+ demo-to-trial conversion. Respond same day.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 6,
+        "last_recalled": "2026-04-01T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Sales_synthetic_1",
+        "timestamp": "2026-03-23T06:15:44.762Z",
+        "key": "lead_pattern",
+        "value": "35+ truck carriers who reply to Email 1 are hot leads. Skip Email 2, go straight to discovery call.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 7,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Sales_synthetic_2",
+        "timestamp": "2026-03-26T06:15:44.762Z",
+        "key": "pipeline_pattern",
+        "value": "Canada leads: never enter USA sequence. Log separately for Year 2 launch.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 1,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Sales_synthetic_3",
+        "timestamp": "2026-03-29T06:15:44.762Z",
+        "key": "enterprise_pattern",
+        "value": "1000+ employee companies = pause all automation, escalate to owner. Standard sequence will not close them.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 2,
+        "last_recalled": "2026-04-02T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Sales_synthetic_4",
+        "timestamp": "2026-04-01T06:15:44.762Z",
+        "key": "sequence_pattern",
+        "value": "Email 4 (breakup email) gets 15% reply rate. \"Should I stop reaching out?\" subject line has highest open rate.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 8,
+        "last_recalled": "2026-03-31T06:15:44.762Z",
+        "synthetic": true
+      }
+    ],
+    "Onboarding": [
+      {
+        "id": "mem_Onboarding_synthetic_0",
+        "timestamp": "2026-03-26T06:15:44.762Z",
+        "key": "conversion_pattern",
+        "value": "Carriers who complete 3+ loads in 7-day trial convert to paid at 85%+ rate. Day 7 conversion call is formality.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 6,
+        "last_recalled": "2026-04-02T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Onboarding_synthetic_1",
+        "timestamp": "2026-03-29T06:15:44.762Z",
+        "key": "engagement_pattern",
+        "value": "Zero contact by Day 5 = personal owner call needed. Automation alone does not recover ghosting carriers.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 6,
+        "last_recalled": "2026-04-03T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Onboarding_synthetic_2",
+        "timestamp": "2026-04-01T06:15:44.762Z",
+        "key": "trial_pattern",
+        "value": "Best conversion window: Day 6 afternoon. Carrier has completed loads, confidence is high, commitment is fresh.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 7,
+        "last_recalled": "2026-03-31T06:15:44.762Z",
+        "synthetic": true
+      }
+    ],
+    "Receptionist": [
+      {
+        "id": "mem_Receptionist_synthetic_0",
+        "timestamp": "2026-03-26T06:15:44.762Z",
+        "key": "caller_pattern",
+        "value": "FMCSA/DOT callers always give badge numbers. Collect full details, never confirm carrier relationships on the call.",
+        "source": "seed-training-data",
+        "importance": 5,
+        "recall_count": 2,
+        "last_recalled": "2026-04-04T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Receptionist_synthetic_1",
+        "timestamp": "2026-03-29T06:15:44.762Z",
+        "key": "caller_pattern",
+        "value": "Carriers asking about load availability at 11PM are planning next-day moves. Log for Erin morning review.",
+        "source": "seed-training-data",
+        "importance": 3,
+        "recall_count": 2,
+        "last_recalled": "2026-04-02T06:15:44.762Z",
+        "synthetic": true
+      },
+      {
+        "id": "mem_Receptionist_synthetic_2",
+        "timestamp": "2026-04-01T06:15:44.762Z",
+        "key": "routing_pattern",
+        "value": "Callers who ask \"is this the AI dispatching company\" are usually media or competitors. Route to Sales, not Erin.",
+        "source": "seed-training-data",
+        "importance": 4,
+        "recall_count": 7,
+        "last_recalled": "2026-04-01T06:15:44.762Z",
+        "synthetic": true
       }
     ]
   }

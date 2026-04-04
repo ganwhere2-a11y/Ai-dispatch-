@@ -218,6 +218,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
   .sb{position:fixed;top:0;left:-252px;z-index:9;transition:left .25s;height:100vh}
   .sb.open{left:0}
   .ham{display:flex}
+  .tb-toggle{display:none}
   .sb-ov.show{display:block}
   #pg-dash{padding:52px 12px 12px}
   .stats{grid-template-columns:1fr}
@@ -324,6 +325,88 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
       </div>
       <div class="card-lbl" style="margin-bottom:12px">Your AI Team</div>
       <div class="team-grid" id="team-grid"></div>
+
+      <!-- UNCLE KENNETH — Approved carrier account -->
+      <div id="kenneth-card" style="margin-top:18px;border-radius:12px;background:var(--surf);border:1px solid var(--borderHi);padding:18px 20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-size:26px">🚛</div>
+            <div>
+              <div style="font-size:14px;font-weight:700">Uncle Kenneth</div>
+              <div style="font-size:10px;color:var(--low);letter-spacing:.5px">DEDICATED CARRIER ACCOUNT · OWNER-APPROVED</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="kenneth-status-badge" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:5px;background:var(--amberDim);color:var(--amber);border:1px solid rgba(245,166,35,.3)">SETUP NEEDED</span>
+            <button onclick="showKennethSetup()" style="padding:5px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surfHi);color:var(--mid);font-size:11px;cursor:pointer;font-family:inherit">Edit Profile</button>
+          </div>
+        </div>
+
+        <!-- Status row -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px" id="kenneth-stats">
+          <div style="background:var(--surfHi);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+            <div style="font-size:9px;color:var(--low);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Loads This Month</div>
+            <div style="font-size:20px;font-weight:700" id="k-loads">0</div>
+          </div>
+          <div style="background:var(--surfHi);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+            <div style="font-size:9px;color:var(--low);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Revenue</div>
+            <div style="font-size:20px;font-weight:700" id="k-rev">$0</div>
+          </div>
+          <div style="background:var(--surfHi);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+            <div style="font-size:9px;color:var(--low);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Iron Rules</div>
+            <div style="font-size:20px;font-weight:700;color:var(--amber)" id="k-rules">—</div>
+          </div>
+        </div>
+
+        <!-- Iron rules checklist -->
+        <div style="background:var(--bg);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--low);text-transform:uppercase;margin-bottom:8px">Iron Rules — Same Standards, No Exceptions</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px" id="kenneth-rules-list">
+            ${['No Florida','RPM ≥ $2.51','Deadhead ≤ 50mi','Weight ≤ 48K lbs','Dry Van Only','Authority 180+ days','Safety: Satisfactory/Unrated'].map(r=>`
+              <span style="font-size:10px;padding:2px 8px;border-radius:4px;background:var(--surfHi);color:var(--low);border:1px solid var(--border)">${r}</span>`).join('')}
+          </div>
+        </div>
+
+        <!-- Setup prompt or profile info -->
+        <div id="kenneth-setup-prompt" style="padding:10px 14px;border-radius:8px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);font-size:12px;color:var(--amber);display:flex;align-items:center;gap:8px">
+          <span>⚠️</span>
+          <span>Fill in Kenneth's carrier info to activate dispatching. Click <strong>Edit Profile</strong> to get started.</span>
+        </div>
+        <div id="kenneth-profile-info" style="display:none;font-size:12px;color:var(--mid);line-height:1.8" id="kenneth-info-display"></div>
+      </div>
+
+      <!-- KENNETH SETUP MODAL -->
+      <div id="kenneth-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:16px">
+        <div style="background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+            <div style="font-size:16px;font-weight:700">🚛 Kenneth's Carrier Profile</div>
+            <button onclick="closeKennethModal()" style="background:none;border:none;color:var(--low);font-size:18px;cursor:pointer">✕</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="sv-field"><label>MC Number</label><input id="k-mc" placeholder="MC-XXXXXX"></div>
+            <div class="sv-field"><label>DOT Number</label><input id="k-dot" placeholder="DOT-XXXXXXX"></div>
+            <div class="sv-field"><label>Home Base</label><input id="k-city" placeholder="City, State"></div>
+            <div class="sv-field"><label>Phone</label><input id="k-phone" placeholder="(555) 000-0000"></div>
+            <div class="sv-field"><label>Truck Type</label><input id="k-truck" placeholder="53ft Dry Van"></div>
+            <div class="sv-field"><label>Max Weight (lbs)</label><input id="k-weight" placeholder="48000"></div>
+            <div class="sv-field"><label>Insurance Expiry</label><input id="k-ins" placeholder="MM/DD/YYYY"></div>
+            <div class="sv-field"><label>Authority Issue Date</label><input id="k-auth" placeholder="MM/DD/YYYY"></div>
+          </div>
+          <div class="sv-field"><label>Preferred Lanes</label><input id="k-lanes" placeholder="e.g. Midwest, Southeast, Texas"></div>
+          <div class="sv-field"><label>Safety Rating</label>
+            <select id="k-safety" style="width:100%;padding:8px 11px;border-radius:7px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:12px;font-family:inherit">
+              <option value="">Select...</option>
+              <option>Satisfactory</option>
+              <option>Unrated</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button onclick="saveKennethProfile()" style="flex:1;padding:10px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Save Profile</button>
+            <button onclick="closeKennethModal()" style="padding:10px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--low);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>
+          </div>
+        </div>
+      </div>
+
       <div style="height:20px"></div>
     </div>
   </div>
@@ -1396,6 +1479,73 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 })
 
+// ── UNCLE KENNETH CARRIER PROFILE ────────────────────────────────────────────
+function showKennethSetup() {
+  const saved = JSON.parse(localStorage.getItem('ai_dispatch_kenneth') || '{}')
+  const fields = ['mc','dot','city','phone','truck','weight','ins','auth','lanes','safety']
+  fields.forEach(f => { const el = document.getElementById('k-'+f); if(el && saved[f]) el.value = saved[f] })
+  document.getElementById('kenneth-modal').style.display = 'flex'
+}
+
+function closeKennethModal() {
+  document.getElementById('kenneth-modal').style.display = 'none'
+}
+
+function saveKennethProfile() {
+  const data = {}
+  const fields = ['mc','dot','city','phone','truck','weight','ins','auth','lanes','safety']
+  fields.forEach(f => { const el = document.getElementById('k-'+f); if(el) data[f] = el.value })
+  localStorage.setItem('ai_dispatch_kenneth', JSON.stringify(data))
+  closeKennethModal()
+  loadKennethProfile()
+  alert('✓ Kenneth\'s profile saved. Erin will apply Iron Rules before any load is assigned.')
+}
+
+function loadKennethProfile() {
+  const saved = JSON.parse(localStorage.getItem('ai_dispatch_kenneth') || '{}')
+  const hasData = saved.mc || saved.dot
+  const badge = document.getElementById('kenneth-status-badge')
+  const prompt = document.getElementById('kenneth-setup-prompt')
+  const info = document.getElementById('kenneth-profile-info')
+
+  if (hasData) {
+    badge.textContent = 'ACTIVE'
+    badge.style.background = 'var(--greenDim)'
+    badge.style.color = 'var(--green)'
+    badge.style.border = '1px solid rgba(0,214,143,.3)'
+    prompt.style.display = 'none'
+    info.style.display = 'block'
+    info.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">
+        <div><span style="color:var(--low)">MC:</span> ${saved.mc||'—'}</div>
+        <div><span style="color:var(--low)">DOT:</span> ${saved.dot||'—'}</div>
+        <div><span style="color:var(--low)">Home Base:</span> ${saved.city||'—'}</div>
+        <div><span style="color:var(--low)">Equipment:</span> ${saved.truck||'—'}</div>
+        <div><span style="color:var(--low)">Safety Rating:</span> <span style="color:var(--green)">${saved.safety||'—'}</span></div>
+        <div><span style="color:var(--low)">Max Weight:</span> ${saved.weight ? Number(saved.weight).toLocaleString()+' lbs' : '—'}</div>
+        <div style="grid-column:1/-1"><span style="color:var(--low)">Preferred Lanes:</span> ${saved.lanes||'—'}</div>
+        <div><span style="color:var(--low)">Insurance Expiry:</span> ${saved.ins||'—'}</div>
+        <div><span style="color:var(--low)">Authority Date:</span> ${saved.auth||'—'}</div>
+      </div>`
+    // Update iron rules badge
+    const rulesEl = document.getElementById('k-rules')
+    if(rulesEl) { rulesEl.textContent = '✓'; rulesEl.style.color = 'var(--green)' }
+  } else {
+    badge.textContent = 'SETUP NEEDED'
+    badge.style.background = 'var(--amberDim)'
+    badge.style.color = 'var(--amber)'
+    prompt.style.display = 'flex'
+    info.style.display = 'none'
+  }
+}
+
+// Close modal on backdrop click
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('kenneth-modal')?.addEventListener('click', e => {
+    if(e.target === document.getElementById('kenneth-modal')) closeKennethModal()
+  })
+})
+
 // ── AUTO-FILL FROM SITE ───────────────────────────────────────────────────────
 async function autoFillFromSite() {
   const url = document.getElementById('kb-site').value.trim()
@@ -1463,6 +1613,7 @@ switchMarket('usa')
 loadData()
 loadProfile()
 loadPersonalisation()
+loadKennethProfile()
 renderSavedKb()
 buildIntegrationsList()
 loadServerSops()

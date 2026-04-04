@@ -24,6 +24,7 @@
     "test:maya-sms": "node agents/maya/maya.js --test-sms",
     "health": "node scripts/health-check.js",
     "seed-sops": "node scripts/seed-sops.js",
+    "seed-training": "node scripts/seed-training-data.js",
     "ceo-shadow": "node agents/shadow/shadow.js"
   },
   "dependencies": {
