@@ -10,6 +10,9 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { getSummary as getDecisionSummary } from './decision_engine/engine.js'
 import fs from 'fs/promises'
+import TelegramBot from 'node-telegram-bot-api'
+import { generateAndSendReport } from './workflows/daily_morning_report.js'
+import cron from 'node-cron'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -270,4 +273,65 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`[AI Dispatch] Command Center → http://localhost:${PORT}`)
   console.log(`[AI Dispatch] Market: ${process.env.ACTIVE_CONTEXT || 'USA'}`)
+
+  // ── Maya Telegram Bot — incoming message handler ───────────────────────────
+  if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_OWNER_CHAT_ID) {
+    const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true })
+    const OWNER_ID = process.env.TELEGRAM_OWNER_CHAT_ID
+
+    bot.on('message', async (msg) => {
+      const chatId = String(msg.chat.id)
+      const text = (msg.text || '').toLowerCase().trim()
+
+      // Only respond to owner
+      if (chatId !== String(OWNER_ID)) return
+
+      try {
+        if (text === '/start' || text === 'start') {
+          await bot.sendMessage(chatId,
+            'Maya online. Commands:\n\n' +
+            '• "briefing" — Morning report now\n' +
+            '• "status" — System status\n' +
+            '• "pause" — Pause all agents\n' +
+            '• "resume" — Resume agents'
+          )
+        } else if (text.includes('brief') || text.includes('report') || text.includes('morning')) {
+          await bot.sendMessage(chatId, 'Generating your morning report...')
+          await generateAndSendReport()
+        } else if (text === 'status') {
+          const data = await getLiveData()
+          await bot.sendMessage(chatId,
+            `AI DISPATCH STATUS\n` +
+            `Market: ${data.market} | Paused: ${data.paused ? 'YES' : 'NO'}\n` +
+            `Active Loads: ${data.metrics.activeLoads} | Trucks: ${data.metrics.truckCount}\n` +
+            `Decisions this week: ${data.decisions.thisWeek}`
+          )
+        } else if (text === 'pause') {
+          process.env.AI_DISPATCH_PAUSED = 'true'
+          await bot.sendMessage(chatId, 'MAYA: All agents paused. Send "resume" to restart.')
+        } else if (text === 'resume') {
+          process.env.AI_DISPATCH_PAUSED = 'false'
+          await bot.sendMessage(chatId, 'MAYA: Agents resumed. System is live.')
+        } else {
+          await bot.sendMessage(chatId,
+            'Commands: "briefing", "status", "pause", "resume"'
+          )
+        }
+      } catch (err) {
+        console.error('[Maya Bot] Error:', err.message)
+        await bot.sendMessage(chatId, 'Error processing request. Check logs.').catch(() => {})
+      }
+    })
+
+    // ── 6AM daily report cron ────────────────────────────────────────────────
+    cron.schedule('0 6 * * *', async () => {
+      console.log('[Maya] 6AM cron — generating morning report')
+      await generateAndSendReport().catch(err => console.error('[Maya] Cron report failed:', err.message))
+    }, { timezone: 'America/Chicago' })
+
+    console.log('[Maya] Telegram bot active — listening for owner commands')
+    console.log('[Maya] Morning report cron set for 6AM America/Chicago')
+  } else {
+    console.log('[Maya] Telegram not configured — set TELEGRAM_BOT_TOKEN and TELEGRAM_OWNER_CHAT_ID')
+  }
 })
