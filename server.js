@@ -11,7 +11,6 @@ import { fileURLToPath } from 'url'
 import { getSummary as getDecisionSummary } from './decision_engine/engine.js'
 import fs from 'fs/promises'
 import TelegramBot from 'node-telegram-bot-api'
-import { generateAndSendReport } from './workflows/daily_morning_report.js'
 import cron from 'node-cron'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -269,6 +268,65 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'command_center', 'dashboard.html'))
 })
 
+// ── Maya morning report builder (self-contained, no circular deps) ────────────
+async function buildMorningReport() {
+  if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY not set in Railway Variables')
+
+  const data = await getLiveData()
+  const prompt = `Generate Maya's morning report for an AI freight dispatch business.
+
+Date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+Market: ${data.market}
+Active Loads: ${data.metrics.activeLoads}
+Revenue This Week: $${data.metrics.revenueWeek.toLocaleString()}
+Trucks Under Management: ${data.metrics.truckCount}
+Trial Prospects: ${data.metrics.trialCount}
+Decisions This Week: ${data.decisions.thisWeek}
+CEO Shadow Phase: ${data.shadow.phase} (${data.shadow.confidence}% confidence)
+
+Format EXACTLY like this:
+MAYA | Morning Report — [Date] | Market: ${data.market}
+
+BUSINESS STATE
+Active Loads: [N] | Revenue This Week: $[X]
+Trucks: [N] | Trials: [N] active
+
+TODAY'S PRIORITY LIST
+1. [most important]
+2. [second]
+3. [third]
+
+NEEDS YOUR DECISION
+• [items needing owner approval — or "None today"]
+
+ANYTHING WRONG
+[issues or "All systems running. No flags."]
+
+Keep it under 350 words. Plain English.`
+
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 600,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  })
+
+  if (!r.ok) {
+    const err = await r.text()
+    throw new Error(`Anthropic API error ${r.status}: ${err}`)
+  }
+
+  const json = await r.json()
+  return json.content[0].text
+}
+
 // ── Start ─────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`[AI Dispatch] Command Center → http://localhost:${PORT}`)
@@ -297,7 +355,14 @@ app.listen(PORT, () => {
           )
         } else if (text.includes('brief') || text.includes('report') || text.includes('morning')) {
           await bot.sendMessage(chatId, 'Generating your morning report...')
-          await generateAndSendReport()
+          const reportText = await buildMorningReport()
+          // Split if over Telegram's 4096 char limit
+          if (reportText.length <= 4096) {
+            await bot.sendMessage(chatId, reportText)
+          } else {
+            await bot.sendMessage(chatId, reportText.slice(0, 4096))
+            await bot.sendMessage(chatId, reportText.slice(4096))
+          }
         } else if (text === 'status') {
           const data = await getLiveData()
           await bot.sendMessage(chatId,
@@ -318,15 +383,21 @@ app.listen(PORT, () => {
           )
         }
       } catch (err) {
-        console.error('[Maya Bot] Error:', err.message)
-        await bot.sendMessage(chatId, 'Error processing request. Check logs.').catch(() => {})
+        console.error('[Maya Bot] Error:', err.message, err.stack)
+        await bot.sendMessage(chatId, `Maya error: ${err.message}`).catch(() => {})
       }
     })
 
     // ── 6AM daily report cron ────────────────────────────────────────────────
     cron.schedule('0 6 * * *', async () => {
       console.log('[Maya] 6AM cron — generating morning report')
-      await generateAndSendReport().catch(err => console.error('[Maya] Cron report failed:', err.message))
+      try {
+        const report = await buildMorningReport()
+        await bot.sendMessage(OWNER_ID, report)
+      } catch (err) {
+        console.error('[Maya] Cron report failed:', err.message)
+        await bot.sendMessage(OWNER_ID, `Maya error generating report: ${err.message}`).catch(() => {})
+      }
     }, { timezone: 'America/Chicago' })
 
     console.log('[Maya] Telegram bot active — listening for owner commands')
