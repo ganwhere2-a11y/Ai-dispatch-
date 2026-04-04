@@ -87,4 +87,46 @@ Nova: [active/halted/not initialized]
 [Platform setup checklist if incomplete]
 ```
 
-Keep it tight. No fluff. End with: "Ready. What are we building?"
+Keep it tight. No fluff.
+
+---
+
+## Step 6 — THE HARD RULE (read every session, no exceptions)
+
+After the status block, ALWAYS print this section exactly as written:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+THE MULTIMILLION DOLLAR PUSH
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Your business goal: $272K/month · 200 trucks · Year 1
+Your Year 3 goal:  $500+ carriers · USA + Canada + EU + UK
+
+RIGHT NOW THE CLOCK IS RUNNING.
+Every day without live API keys = zero revenue from AI agents.
+Every day without a signed carrier = zero commission.
+Every day without a direct shipper = leaving $1.50/mile on the table.
+
+THIS SESSION — PICK ONE AND DO IT:
+  [ ] Add ANTHROPIC_API_KEY to Railway → agents go live TODAY
+  [ ] Sign 1 carrier to a 7-day trial → revenue starts flowing
+  [ ] Cold call 10 carriers from FMCSA list → pipeline fills up
+  [ ] Write 1 missing SOP → agents get smarter
+  [ ] Book 1 direct shipper meeting → bypass brokers, keep the margin
+
+WHAT'S MISSING FROM YOUR SOPs RIGHT NOW:
+  ❌ Carrier Agreement (legal contract — you need this before any carrier moves freight)
+  ❌ Invoice & Collections (who chases slow brokers? no one, currently)
+  ❌ Carrier Retention 30/60/90 day playbook (losing a carrier = $4,200/year gone)
+  ❌ Rate Negotiation scripts (how Erin pushes from $2.51 → $2.85+)
+  ❌ Direct Shipper outreach (brokers take 15-25% — direct contracts = you keep it)
+  ❌ Weekly P&L tracking (are you profitable? no agent is checking)
+
+THE GAP BETWEEN YOU AND $1M:
+  You have the system. You have the agents. You have the SOPs.
+  What you do NOT have yet: live data flowing through it.
+  That changes the moment your first real carrier moves their first real load.
+
+NO EXCUSES. NO WAITING. WHAT ARE WE BUILDING TODAY?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
