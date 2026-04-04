@@ -178,15 +178,24 @@ app.delete('/api/sop/:id', async (req, res) => {
   } catch { res.json({ ok: false }) }
 })
 
-// Load saved SOPs to inject into chat context
-async function loadSopContext() {
+// Load saved SOPs filtered to the requesting agent
+// scope values: 'All agents (global)', 'Maya only', 'Erin only', etc.
+async function loadSopContext(agentName) {
   try {
     const files = (await fs.readdir(SOP_DIR)).filter(f => f.endsWith('.json'))
     const sops = await Promise.all(files.map(async f => {
       const raw = await fs.readFile(path.join(SOP_DIR, f), 'utf8')
       return JSON.parse(raw)
     }))
-    return sops.map(s => `=== ${s.title} [${s.scope}] ===\n${s.content}`).join('\n\n')
+    const agentLower = (agentName || '').toLowerCase()
+    const relevant = sops.filter(s => {
+      const scope = (s.scope || '').toLowerCase()
+      if (scope === 'all agents (global)') return true
+      // Match "maya only" → agentName "Maya", "erin only" → "Erin", etc.
+      return scope.startsWith(agentLower)
+    })
+    if (relevant.length === 0) return ''
+    return relevant.map(s => `=== ${s.title} [${s.scope}] ===\n${s.content}`).join('\n\n')
   } catch { return '' }
 }
 
@@ -221,15 +230,15 @@ app.post('/api/workflow/run', async (req, res) => {
 
 // ── Chat proxy (keeps API key server-side) ────────────────────────────────────
 app.post('/api/chat', async (req, res) => {
-  const { messages, system } = req.body
+  const { messages, system, agentName } = req.body
   if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'your_key') {
     return res.json({ content: [{ text: '⚠️ ANTHROPIC_API_KEY not set in Railway Variables. Add it to enable live AI responses.' }] })
   }
   try {
-    // Inject saved SOPs into system prompt
-    const sopContext = await loadSopContext()
+    // Inject only SOPs scoped to this agent (or global)
+    const sopContext = await loadSopContext(agentName)
     const fullSystem = sopContext
-      ? `${system}\n\n--- OWNER KNOWLEDGE BASE (highest priority) ---\n${sopContext}`
+      ? `${system}\n\n--- OWNER KNOWLEDGE BASE (highest priority — ${agentName || 'agent'}-specific) ---\n${sopContext}`
       : system
 
     const r = await fetch('https://api.anthropic.com/v1/messages', {

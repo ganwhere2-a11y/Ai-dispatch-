@@ -821,7 +821,7 @@ End every response with a clear next action.`
   try {
     const res = await fetch('/api/chat', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ system:sys, messages:chatHistory })
+      body:JSON.stringify({ system:sys, messages:chatHistory, agentName: currentAgent.name })
     })
     const data = await res.json()
     const reply = data.content?.[0]?.text || data.error || 'Error — please retry.'
@@ -1204,14 +1204,23 @@ async function loadServerSops() {
     if(!s || !container) return
     if(sops.length===0 && JSON.parse(localStorage.getItem('ai_dispatch_custom_kb')||'[]').length===0) { s.style.display='none'; return }
     s.style.display=''
-    const serverHtml = sops.map(sop=>`
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
-        <div>
-          <div style="font-weight:500">📄 ${sop.title||sop.filename}</div>
-          <div style="font-size:10px;color:var(--low)">${sop.scope} · ${new Date(sop.saved).toLocaleDateString()} · Saved to server · injected into all agents</div>
+    const serverHtml = sops.map(sop=>{
+      const scopeLabel = sop.scope||'All agents (global)'
+      const isGlobal = scopeLabel.toLowerCase().includes('global')
+      const badgeColor = isGlobal ? 'var(--green)' : 'var(--blue)'
+      const badgeBg = isGlobal ? 'var(--greenDim)' : 'var(--blueDim)'
+      const scopeShort = isGlobal ? '🌐 All agents' : '🎯 '+scopeLabel.replace(' only','')
+      return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:12px;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:500;margin-bottom:3px">📄 ${sop.title||sop.filename}</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:10px;padding:2px 7px;border-radius:4px;background:${badgeBg};color:${badgeColor};font-weight:600;white-space:nowrap">${scopeShort}</span>
+            <span style="font-size:10px;color:var(--low)">${new Date(sop.saved).toLocaleDateString()}</span>
+          </div>
         </div>
-        <button onclick="deleteSop('${sop.id}')" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;padding:2px 6px">Delete</button>
-      </div>`).join('')
+        <button onclick="deleteSop('${sop.id}')" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;padding:2px 6px;flex-shrink:0">Delete</button>
+      </div>`}).join('')
     container.innerHTML = serverHtml
   } catch {}
 }
@@ -1399,7 +1408,8 @@ async function autoFillFromSite() {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         system: 'You help freight dispatch businesses set up their AI Command Center. Be concise.',
-        messages:[{role:'user',content:`Based on the website URL "${url}", write a 2-sentence description of what this freight dispatch business does — their niche, services, and market. Then on a new line write their likely revenue and growth goal in one sentence. Keep it under 60 words total.`}]
+        messages:[{role:'user',content:`Based on the website URL "${url}", write a 2-sentence description of what this freight dispatch business does — their niche, services, and market. Then on a new line write their likely revenue and growth goal in one sentence. Keep it under 60 words total.`}],
+        agentName: 'Maya'
       })
     })
     const d = await res.json()
