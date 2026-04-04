@@ -958,12 +958,32 @@ function saveKb() {
   alert('Knowledgebase saved.')
 }
 
-function saveCustomKb() {
+async function saveCustomKb() {
+  const title = document.getElementById('kb-title').value.trim()
+  const scope = document.getElementById('kb-scope').value
+  const body = document.getElementById('kb-body').value.trim()
+  if(!title) { alert('Please enter a title before saving.'); return }
+  if(!body) { alert('Please enter some content before saving.'); return }
+
+  // Save to server first (agents need this)
+  let serverOk = false
+  try {
+    const r = await fetch('/api/sop/save', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ title, scope, content: body, filename: title.replace(/\s+/g,'_').replace(/[^a-z0-9_]/gi,'') + '.md', type:'md' })
+    })
+    const d = await r.json()
+    serverOk = d.ok
+  } catch {}
+
+  // Also save to localStorage as backup
   const entries = JSON.parse(localStorage.getItem('ai_dispatch_custom_kb')||'[]')
-  entries.push({ title:document.getElementById('kb-title').value, scope:document.getElementById('kb-scope').value, body:document.getElementById('kb-body').value, saved:new Date().toISOString() })
+  entries.push({ title, scope, body, saved:new Date().toISOString() })
   localStorage.setItem('ai_dispatch_custom_kb', JSON.stringify(entries))
-  clearKb(); renderSavedKb()
-  alert('Knowledge saved.')
+
+  clearKb()
+  await loadServerSops()
+  alert(serverOk ? `✓ "${title}" saved to server — all agents now have access.` : `"${title}" saved locally. Connect to Railway for server sync.`)
 }
 
 function clearKb() {

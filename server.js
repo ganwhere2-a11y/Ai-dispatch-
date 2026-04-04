@@ -123,11 +123,40 @@ app.post('/api/sop/save', async (req, res) => {
     const { title, scope, content, filename, type } = req.body
     const safeName = (filename || title || 'sop').replace(/[^a-z0-9._-]/gi, '_')
     const id = Date.now() + '_' + safeName
-    const meta = { id, title, scope, content: (content || '').slice(0, 10000), filename: safeName, type, saved: new Date().toISOString() }
+    const textContent = (content || '').slice(0, 10000)
+    const meta = { id, title, scope, content: textContent, filename: safeName, type, saved: new Date().toISOString() }
     await fs.writeFile(path.join(SOP_DIR, id + '.json'), JSON.stringify(meta, null, 2))
+
+    // Auto-commit to sops/training/ in git (background — non-blocking)
+    autoCommitSop(title, safeName, textContent, scope).catch(() => {})
+
     res.json({ ok: true, id })
   } catch (e) { res.status(500).json({ error: e.message }) }
 })
+
+async function autoCommitSop(title, safeName, content, scope) {
+  try {
+    const { execFile } = await import('child_process')
+    const { promisify } = await import('util')
+    const exec = promisify(execFile)
+
+    const trainingDir = path.join(__dirname, 'sops/training')
+    await fs.mkdir(trainingDir, { recursive: true })
+
+    // Write as markdown file in sops/training/
+    const mdName = safeName.replace(/\.json$/, '').replace(/[^a-z0-9._-]/gi, '_') + '.md'
+    const mdPath = path.join(trainingDir, mdName)
+    const mdContent = `# ${title}\n**Scope:** ${scope}\n**Saved:** ${new Date().toISOString()}\n\n---\n\n${content}`
+    await fs.writeFile(mdPath, mdContent)
+
+    // Git commit + push
+    await exec('git', ['add', path.join('sops/training', mdName)], { cwd: __dirname })
+    await exec('git', ['commit', '-m', `SOP saved from dashboard: ${title}`], { cwd: __dirname })
+    await exec('git', ['push', '-u', 'origin', 'main'], { cwd: __dirname })
+  } catch {
+    // Silent fail — server save is primary, git is bonus
+  }
+}
 
 app.get('/api/sops', async (req, res) => {
   try {
